@@ -119,8 +119,8 @@ img {
 }
 
 .header__logo {
-  width: 42px;
-  height: 42px;
+  width: 56px;
+  height: 56px;
   border-radius: var(--radius-md);
   object-fit: cover;
   box-shadow: var(--shadow-sm);
@@ -129,6 +129,7 @@ img {
 .header__info {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .header__name {
@@ -137,11 +138,31 @@ img {
   font-size: 18px;
   color: var(--text-main);
   line-height: 1.2;
+  margin-bottom: 2px;
 }
 
 .header__tagline {
   font-size: 12px;
   color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.header__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.header__meta-item {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-surface-alt);
+  padding: 2px 8px;
+  border-radius: 4px;
   font-weight: 500;
 }
 
@@ -224,7 +245,7 @@ img {
 /* --- Category Navigation --- */
 .categories-nav {
   position: sticky;
-  top: 115px; /* Adjust based on header height */
+  top: 155px; /* Adjust based on header height */
   z-index: 30;
   background: var(--bg-body); /* Match body bg to blend */
   padding: 8px 0 16px;

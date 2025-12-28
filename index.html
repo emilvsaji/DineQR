@@ -21,7 +21,14 @@
           <img id="restaurantLogo" class="header__logo" alt="Restaurant Logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%2322c55e' width='100' height='100'/%3E%3Ctext x='50' y='60' text-anchor='middle' fill='white' font-size='40'%3E🍽️%3C/text%3E%3C/svg%3E">
           <div class="header__info">
             <h1 id="restaurantName" class="header__name">Restaurant</h1>
-            <p id="restaurantTagline" class="header__tagline">Delicious • Fresh • Quality</p>
+            <div class="header__details">
+              <p id="restaurantTagline" class="header__tagline">Delicious • Fresh • Quality</p>
+              <div class="header__meta-row">
+                <span id="restaurantAddress" class="header__meta-item hidden"></span>
+                <span id="restaurantHours" class="header__meta-item hidden"></span>
+              </div>
+              <p id="restaurantInfo" class="header__meta hidden"></p>
+            </div>
           </div>
         </div>
         <button class="header__selection" id="selectionBtn" aria-label="View selected items">

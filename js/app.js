@@ -33,6 +33,9 @@
       restaurantLogo: $('#restaurantLogo'),
       restaurantName: $('#restaurantName'),
       restaurantTagline: $('#restaurantTagline'),
+      restaurantAddress: $('#restaurantAddress'),
+      restaurantHours: $('#restaurantHours'),
+      restaurantInfo: $('#restaurantInfo'),
       selectionBtn: $('#selectionBtn'),
       selectionCount: $('#selectionCount'),
       searchInput: $('#searchInput'),
@@ -91,18 +94,18 @@
     return DEFAULT_RESTAURANT;
   }
 
-  function formatPrice(value, currency = 'USD') {
+  function formatPrice(value, currency = 'INR') {
     if (value === null || value === undefined) return '';
     const num = typeof value === 'number' ? value : Number(value);
     if (!Number.isFinite(num)) return String(value);
     
     try {
-      return new Intl.NumberFormat('en-US', { 
+      return new Intl.NumberFormat('en-IN', { 
         style: 'currency', 
         currency: currency 
       }).format(num);
     } catch {
-      return `$${num.toFixed(2)}`;
+      return `₹${num.toFixed(2)}`;
     }
   }
 
@@ -160,7 +163,10 @@
         "restaurant": {
           "id": "ajwa",
           "name": "Ajwa Kitchen",
-          "tagline": "Authentic Arabian • Fresh • Delicious"
+          "tagline": "Authentic Arabian • Fresh • Delicious",
+          "address": "123 Main St, City",
+          "hours": "10:00 - 23:00",
+          "info": "+91 98765 43210"
         },
         "categories": [
           {
@@ -239,6 +245,32 @@
     // Logo
     if (restaurant?.logoUrl) {
       elements.restaurantLogo.src = restaurant.logoUrl;
+    }
+
+    // Address
+    if (restaurant?.address) {
+      elements.restaurantAddress.textContent = '📍 ' + restaurant.address;
+      elements.restaurantAddress.classList.remove('hidden');
+    } else {
+      elements.restaurantAddress.classList.add('hidden');
+    }
+
+    // Hours
+    const hours = restaurant?.hours || restaurant?.openHours;
+    if (hours) {
+      elements.restaurantHours.textContent = '🕒 ' + hours;
+      elements.restaurantHours.classList.remove('hidden');
+    } else {
+      elements.restaurantHours.classList.add('hidden');
+    }
+
+    // Info / Phone
+    const info = restaurant?.info || restaurant?.phone;
+    if (info) {
+      elements.restaurantInfo.textContent = info;
+      elements.restaurantInfo.classList.remove('hidden');
+    } else {
+      elements.restaurantInfo.classList.add('hidden');
     }
   }
 
@@ -416,7 +448,7 @@
       selectedSize = item.sizes[0]; // Default to first size
       
       elements.modalSizes.innerHTML = item.sizes.map((size, i) => `
-        <div class="modal__size-option ${i === 0 ? 'modal__size-option--selected' : ''}" 
+        <div class="size-option ${i === 0 ? 'size-option--active' : ''}" 
              data-size-index="${i}">
           <div class="modal__size-name">${escapeHtml(size.name)}</div>
           <div class="modal__size-price">${formatPrice(size.price, currency)}</div>
@@ -424,13 +456,13 @@
       `).join('');
       
       // Size click handlers
-      elements.modalSizes.querySelectorAll('.modal__size-option').forEach(opt => {
+      elements.modalSizes.querySelectorAll('.size-option').forEach(opt => {
         opt.addEventListener('click', () => {
           const idx = parseInt(opt.dataset.sizeIndex);
           selectedSize = item.sizes[idx];
-          elements.modalSizes.querySelectorAll('.modal__size-option').forEach(o => 
-            o.classList.remove('modal__size-option--selected'));
-          opt.classList.add('modal__size-option--selected');
+          elements.modalSizes.querySelectorAll('.size-option').forEach(o => 
+            o.classList.remove('size-option--active'));
+          opt.classList.add('size-option--active');
         });
       });
     } else {
