@@ -132,26 +132,41 @@
   // ===== DATA LOADING =====
   async function loadMenu(restaurantId) {
     // Build paths relative to the current page location
-    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+    // Handle both root deployment and subdirectory deployment (like GitHub Pages)
+    const pathname = window.location.pathname;
+    
+    // For GitHub Pages: /DineQR/ or /repo-name/
+    // For root: /
+    let basePath = pathname.substring(0, pathname.lastIndexOf('/') + 1);
+    
+    // Ensure basePath ends with /
+    if (!basePath.endsWith('/')) basePath += '/';
     
     const paths = [
-      `restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
+      `${basePath}restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
       `./restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
-      `${baseUrl}restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
+      `restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
+      `${window.location.origin}${basePath}restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
     ];
+
+    console.log('Trying to load menu from paths:', paths);
 
     for (const path of paths) {
       try {
+        console.log('Fetching:', path);
         const res = await fetch(path, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
+          console.log('Successfully loaded menu from:', path);
           return data;
         }
       } catch (e) {
+        console.log('Failed to fetch from:', path, e.message);
         // Silently continue to next path
       }
     }
 
+    console.log('All paths failed, using fallback menu');
     // If all fetches fail, return fallback menu
     return getFallbackMenu(restaurantId);
   }
@@ -730,8 +745,13 @@
     currentRestaurantId = getRestaurantIdFromUrl();
     applyTheme(currentRestaurantId);
 
+    // Build base path for GitHub Pages compatibility
+    const pathname = window.location.pathname;
+    let basePath = pathname.substring(0, pathname.lastIndexOf('/') + 1);
+    if (!basePath.endsWith('/')) basePath += '/';
+
     // Try to load logo
-    const logoPath = `restaurants/${encodeURIComponent(currentRestaurantId)}/logo.png`;
+    const logoPath = `${basePath}restaurants/${encodeURIComponent(currentRestaurantId)}/logo.png`;
     elements.restaurantLogo.onerror = () => {
       elements.restaurantLogo.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%2322c55e" width="100" height="100"/%3E%3Ctext x="50" y="60" text-anchor="middle" fill="white" font-size="40"%3E🍽️%3C/text%3E%3C/svg%3E';
     };
