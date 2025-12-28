@@ -1,0 +1,2 @@
+Placeholder for shared assets (icons/images).
+Add files like veg.svg, non-veg.svg, placeholder.png here when available.
