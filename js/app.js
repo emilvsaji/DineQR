@@ -237,10 +237,9 @@
     const encoded = encodeURIComponent(restaurantId);
     const file = filename.replace(/^\/+/, '');
 
-    // Now serving from root, so restaurants are at ./restaurants/<id>/...
+    // Use only relative paths to work on GitHub Pages subpaths like /DineQR/
     return [
-      `./restaurants/${encoded}/${file}`,
-      `/restaurants/${encoded}/${file}`,
+      `restaurants/${encoded}/${file}`,
     ];
   }
 
