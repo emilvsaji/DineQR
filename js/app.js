@@ -29,9 +29,17 @@
 
     // Optional: /<id>/ style (when hosting per-restaurant subpaths)
     // Example: https://site.com/spice-garden/
-    const pathParts = url.pathname.split('/').filter(Boolean);
-    if (pathParts.length >= 1 && pathParts[pathParts.length - 1] !== 'index.html') {
-      return pathParts[pathParts.length - 1];
+    // Skip path parsing for GitHub Pages URLs (which include repository name in path)
+    const hostname = url.hostname.toLowerCase();
+    if (!hostname.includes('github.io')) {
+      const pathParts = url.pathname.split('/').filter(Boolean);
+      if (pathParts.length >= 1 && pathParts[pathParts.length - 1] !== 'index.html') {
+        const lastPart = pathParts[pathParts.length - 1];
+        // Only treat as restaurant ID if it looks like one (contains hyphens or is not just the repo name)
+        if (lastPart.includes('-') || lastPart.length < 20) {
+          return lastPart;
+        }
+      }
     }
 
     // Default to spice-garden if no restaurant specified
