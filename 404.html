@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>DineQR Menu</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar" role="banner">
+      <div class="topbar__brand">
+        <img id="restaurantLogo" class="topbar__logo" alt="" hidden />
+        <div class="topbar__titles">
+          <div id="restaurantName" class="topbar__name">Menu</div>
+          <div id="restaurantMeta" class="topbar__meta" hidden></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" role="main">
+      <section class="card" aria-live="polite">
+        <div id="status" class="status status--loading">
+          Loading menu…
+        </div>
+
+        <div id="menu" class="menu" hidden>
+          <div id="categories" class="categories"></div>
+        </div>
+
+        <div id="error" class="status status--error" hidden></div>
+      </section>
+
+      <footer class="footer">
+        <span id="poweredBy" class="footer__text">Powered by DineQR</span>
+      </footer>
+    </main>
+
+    <script src="./js/app.js" defer></script>
+  </body>
+</html>
