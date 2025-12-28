@@ -1,41 +1,163 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
-    <title>DineQR Menu</title>
-    <link rel="stylesheet" href="./css/styles.css" />
-  </head>
-  <body>
-    <header class="topbar" role="banner">
-      <div class="topbar__brand">
-        <img id="restaurantLogo" class="topbar__logo" alt="" hidden />
-        <div class="topbar__titles">
-          <div id="restaurantName" class="topbar__name">Menu</div>
-          <div id="restaurantMeta" class="topbar__meta" hidden></div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#22c55e">
+  <meta name="description" content="Digital QR Menu - Browse our delicious menu items">
+  <title>DineQR Menu</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__top">
+        <div class="header__brand">
+          <img id="restaurantLogo" class="header__logo" alt="Restaurant Logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%2322c55e' width='100' height='100'/%3E%3Ctext x='50' y='60' text-anchor='middle' fill='white' font-size='40'%3E🍽️%3C/text%3E%3C/svg%3E">
+          <div class="header__info">
+            <h1 id="restaurantName" class="header__name">Restaurant</h1>
+            <p id="restaurantTagline" class="header__tagline">Delicious • Fresh • Quality</p>
+          </div>
         </div>
+        <button class="header__cart" id="cartBtn" aria-label="View cart">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="header__cart-badge" id="cartBadge">0</span>
+        </button>
+      </div>
+      <div class="search">
+        <svg class="search__icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search__input" id="searchInput" placeholder="Search menu...">
       </div>
     </header>
 
-    <main class="container" role="main">
-      <section class="card" aria-live="polite">
-        <div id="status" class="status status--loading">
-          Loading menu…
-        </div>
+    <!-- Category Navigation -->
+    <nav class="categories-nav" id="categoriesNav">
+      <div class="categories-scroll" id="categoriesScroll">
+        <button class="category-tab category-tab--active" data-category="all">All</button>
+      </div>
+    </nav>
 
-        <div id="menu" class="menu" hidden>
-          <div id="categories" class="categories"></div>
-        </div>
+    <!-- Main Content -->
+    <main class="main" id="mainContent">
+      <!-- Loading State -->
+      <div class="status status--loading" id="loadingState">
+        <div class="spinner"></div>
+        <p>Loading menu...</p>
+      </div>
 
-        <div id="error" class="status status--error" hidden></div>
-      </section>
+      <!-- Error State -->
+      <div class="status status--error hidden" id="errorState">
+        <p id="errorMessage">Failed to load menu</p>
+      </div>
 
-      <footer class="footer">
-        <span id="poweredBy" class="footer__text">Powered by DineQR</span>
-      </footer>
+      <!-- Menu Content -->
+      <div id="menuContent" class="hidden"></div>
     </main>
 
-    <script src="./js/app.js" defer></script>
-  </body>
+    <!-- Footer -->
+    <footer class="app-footer">
+      Powered by <a href="#">DineQR</a>
+    </footer>
+  </div>
+
+  <!-- Product Detail Modal -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal" id="productModal">
+    <div class="modal__image-wrap">
+      <img class="modal__image" id="modalImage" alt="Product image" src="">
+      <button class="modal__close" id="modalClose">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <h2 class="modal__name" id="modalName">Product Name</h2>
+      <div class="modal__tags" id="modalTags"></div>
+      <p class="modal__desc" id="modalDesc">Product description goes here...</p>
+      
+      <div class="modal__section" id="nutritionSection">
+        <h3 class="modal__section-title">Nutrition</h3>
+        <div class="nutrition-grid" id="nutritionGrid">
+          <div class="nutrition-item">
+            <div class="nutrition-item__value" id="nutritionCalories">--</div>
+            <div class="nutrition-item__label">Calories</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-item__value" id="nutritionCarbs">--</div>
+            <div class="nutrition-item__label">Carbs</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-item__value" id="nutritionProtein">--</div>
+            <div class="nutrition-item__label">Protein</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-item__value" id="nutritionFat">--</div>
+            <div class="nutrition-item__label">Fat</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__section" id="ingredientsSection">
+        <h3 class="modal__section-title">Ingredients</h3>
+        <div class="ingredients-list" id="ingredientsList"></div>
+      </div>
+
+      <div class="modal__footer">
+        <div class="modal__price" id="modalPrice">$0.00</div>
+        <button class="modal__add-btn" id="modalAddBtn">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Panel -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-header">
+      <h2 class="cart-header__title">My Cart</h2>
+      <button class="cart-header__close" id="cartClose">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody">
+      <!-- Cart Empty State -->
+      <div class="cart-empty" id="cartEmpty">
+        <svg class="cart-empty__icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <p>Your cart is empty</p>
+      </div>
+      <!-- Cart Items -->
+      <div class="cart-items hidden" id="cartItems"></div>
+    </div>
+    <div class="cart-options" id="cartOptions">
+      <div class="cart-option">
+        <div class="cart-option__icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <div class="cart-option__label">Estimated Prep Time</div>
+          <div class="cart-option__value">20–30 mins</div>
+        </div>
+      </div>
+      <div class="cart-option">
+        <div class="cart-option__icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <div class="cart-option__label">Table Number</div>
+          <div class="cart-option__value" id="tableNumber">Table 1</div>
+        </div>
+      </div>
+      <textarea class="cart-notes" id="cartNotes" placeholder="Add order notes (allergies, special requests...)"></textarea>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span class="cart-total__label">Total</span>
+        <span class="cart-total__value" id="cartTotal">$0.00</span>
+      </div>
+      <button class="cart-checkout" id="cartCheckout" disabled>Place Order</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
 </html>
