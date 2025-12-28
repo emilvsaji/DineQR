@@ -27,6 +27,17 @@
     const fromHash = (url.hash || '').replace(/^#/, '').trim();
     if (fromHash) return fromHash;
 
+    // Path-based restaurant ID (skip repository name for GitHub Pages)
+    // Example: https://emilvsaji.github.io/DineQR/ajwa -> "ajwa"
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    if (pathParts.length >= 2) {
+      // For GitHub Pages: skip the repo name (first segment) and use the second
+      const restaurantSegment = pathParts[1];
+      if (restaurantSegment && restaurantSegment !== 'index.html') {
+        return restaurantSegment;
+      }
+    }
+
     // Default to spice-garden if no restaurant specified
     return DEFAULT_RESTAURANT;
   }
