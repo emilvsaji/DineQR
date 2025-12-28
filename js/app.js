@@ -229,12 +229,8 @@
     const encoded = encodeURIComponent(restaurantId);
     const file = filename.replace(/^\/+/, '');
 
-    // Support common hosting layouts:
-    // 1) repo root served (index at /public/index.html) => ../restaurants/<id>/...
-    // 2) publish public/ as site root (restaurants copied into public/restaurants) => ./restaurants/<id>/...
-    // 3) restaurants exposed at site root => /restaurants/<id>/...
+    // Now serving from root, so restaurants are at ./restaurants/<id>/...
     return [
-      `../restaurants/${encoded}/${file}`,
       `./restaurants/${encoded}/${file}`,
       `/restaurants/${encoded}/${file}`,
     ];
