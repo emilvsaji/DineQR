@@ -15,7 +15,10 @@
   const restaurantMetaEl = document.getElementById('restaurantMeta');
   const restaurantLogoEl = document.getElementById('restaurantLogo');
 
-  /** @returns {string | null} */
+  // Default restaurant to show when no ID is specified
+  const DEFAULT_RESTAURANT = 'spice-garden';
+
+  /** @returns {string} */
   function getRestaurantIdFromUrl() {
     const url = new URL(window.location.href);
     const fromQuery = (url.searchParams.get('r') || url.searchParams.get('restaurant') || '').trim();
@@ -31,7 +34,8 @@
       return pathParts[pathParts.length - 1];
     }
 
-    return null;
+    // Default to spice-garden if no restaurant specified
+    return DEFAULT_RESTAURANT;
   }
 
   function clearElement(el) {
@@ -272,42 +276,6 @@
     setLoading('Loading menu…');
 
     const restaurantId = getRestaurantIdFromUrl();
-    if (!restaurantId) {
-      const wrapper = document.createElement('div');
-
-      const p1 = document.createElement('div');
-      p1.textContent = 'Missing restaurant id.';
-
-      const p2 = document.createElement('div');
-      p2.style.marginTop = '6px';
-      p2.textContent = 'Try:';
-
-      const list = document.createElement('div');
-      list.style.marginTop = '6px';
-      list.style.display = 'grid';
-      list.style.gap = '6px';
-
-      const makeLink = (id) => {
-        const url = new URL(window.location.href);
-        url.searchParams.set('r', id);
-        url.hash = '';
-
-        const a = document.createElement('a');
-        a.href = url.toString();
-        a.textContent = `?r=${id}`;
-        return a;
-      };
-
-      list.appendChild(makeLink('spice-garden'));
-      list.appendChild(makeLink('food-hub'));
-
-      wrapper.appendChild(p1);
-      wrapper.appendChild(p2);
-      wrapper.appendChild(list);
-
-      setErrorContent(wrapper);
-      return;
-    }
 
     setLogoWithFallback(buildRestaurantPaths(restaurantId, 'logo.png'), 'Restaurant logo');
 
