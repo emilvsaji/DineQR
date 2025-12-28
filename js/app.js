@@ -149,16 +149,33 @@
       `${window.location.origin}${basePath}restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
     ];
 
+    console.log('Base path:', basePath);
     console.log('Trying to load menu from paths:', paths);
 
     for (const path of paths) {
       try {
         console.log('Fetching:', path);
         const res = await fetch(path, { cache: 'no-store' });
+        console.log('Response status:', res.status, 'for path:', path);
+        
         if (res.ok) {
-          const data = await res.json();
-          console.log('Successfully loaded menu from:', path);
-          return data;
+          // Check if response is actually JSON (not an HTML error page)
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await res.json();
+            console.log('Successfully loaded menu from:', path);
+            return data;
+          } else {
+            // Try to parse anyway in case content-type header is wrong
+            const text = await res.text();
+            try {
+              const data = JSON.parse(text);
+              console.log('Successfully loaded menu from:', path);
+              return data;
+            } catch (parseErr) {
+              console.log('Response was not valid JSON from:', path);
+            }
+          }
         }
       } catch (e) {
         console.log('Failed to fetch from:', path, e.message);
@@ -758,7 +775,15 @@
     elements.restaurantLogo.src = logoPath;
 
     try {
+      console.log('Loading menu for restaurant:', currentRestaurantId);
       menuData = await loadMenu(currentRestaurantId);
+      console.log('Menu data loaded:', menuData);
+      
+      if (!menuData || !menuData.categories) {
+        console.log('Invalid menu data, using fallback');
+        menuData = getFallbackMenu(currentRestaurantId);
+      }
+      
       updateHeader(menuData.restaurant);
       renderCategories(menuData.categories || []);
       renderMenuItems();
