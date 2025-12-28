@@ -1,191 +1,275 @@
 {
-  "currency": "USD",
+  "currency": "INR",
   "restaurant": {
     "id": "ajwa",
     "name": "Ajwa Kitchen",
-    "tagline": "Healthy • Fresh • Authentic",
+    "tagline": "Authentic Arabian • Fresh • Delicious",
     "address": "123 Main Street",
-    "phone": "+1 555 0123",
-    "openHours": "Daily 9:00–23:00"
+    "phone": "+91 9876 543210",
+    "openHours": "Daily 11:00 - 23:00"
   },
   "categories": [
     {
-      "name": "Bowls",
+      "name": "Mandi",
       "items": [
         {
-          "name": "Vegan Greens Bowl",
-          "description": "Fresh mixed greens, quinoa, avocado, cherry tomatoes, cucumber, and tahini dressing.",
-          "price": 14.99,
-          "available": true,
-          "type": "veg",
-          "tags": ["Vegan", "Healthy", "Popular"],
-          "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop",
-          "ingredients": ["Mixed Greens", "Quinoa", "Avocado", "Cherry Tomatoes", "Cucumber", "Tahini"],
-          "nutrition": {
-            "calories": 420,
-            "carbs": 45,
-            "protein": 12,
-            "fat": 22
-          }
-        },
-        {
-          "name": "Teriyaki Chicken Bowl",
-          "description": "Grilled teriyaki chicken, jasmine rice, edamame, pickled ginger, and sesame seeds.",
-          "price": 16.99,
+          "name": "Chicken Mandi",
+          "description": "Tender smoked chicken with aromatic long-grain basmati rice, traditional Yemeni spices, and served with special mandi sauce",
           "available": true,
           "type": "non-veg",
-          "tags": ["High Protein"],
-          "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop",
-          "ingredients": ["Chicken Breast", "Jasmine Rice", "Edamame", "Ginger", "Teriyaki Sauce", "Sesame"],
-          "nutrition": {
-            "calories": 580,
-            "carbs": 52,
-            "protein": 38,
-            "fat": 18
-          }
+          "tags": ["Bestseller", "Chef's Special"],
+          "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Quarter", "price": 199 },
+            { "name": "Half", "price": 349 },
+            { "name": "Full", "price": 599 }
+          ]
         },
         {
-          "name": "Mediterranean Bowl",
-          "description": "Falafel, hummus, tabbouleh, olives, feta cheese, and warm pita bread.",
-          "price": 15.49,
+          "name": "Mutton Mandi",
+          "description": "Succulent lamb slow-cooked in underground tandoor, served with fragrant saffron rice and traditional accompaniments",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Premium", "Popular"],
+          "image": "https://images.unsplash.com/photo-1642821373181-696a54913e93?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Quarter", "price": 299 },
+            { "name": "Half", "price": 549 },
+            { "name": "Full", "price": 999 }
+          ]
+        },
+        {
+          "name": "Special Mix Mandi",
+          "description": "Combination of chicken and mutton with aromatic rice, crispy fried onions, nuts, and special mandi spice blend",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Family Favorite"],
+          "image": "https://images.unsplash.com/photo-1701579231305-de47367277cd?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Half", "price": 449 },
+            { "name": "Full", "price": 799 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Biryani",
+      "items": [
+        {
+          "name": "Hyderabadi Chicken Biryani",
+          "description": "Layered dum biryani with tender chicken, basmati rice, fried onions, herbs, and signature Hyderabadi spices",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Bestseller"],
+          "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Regular", "price": 249 },
+            { "name": "Family", "price": 549 }
+          ]
+        },
+        {
+          "name": "Mutton Biryani",
+          "description": "Rich and flavorful mutton dum biryani cooked with aged basmati rice and authentic spices",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Premium"],
+          "image": "https://images.unsplash.com/photo-1633945274309-2c16c9682a8c?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Regular", "price": 349 },
+            { "name": "Family", "price": 749 }
+          ]
+        },
+        {
+          "name": "Veg Biryani",
+          "description": "Aromatic vegetable biryani with fresh seasonal vegetables, paneer, and fragrant spices",
+          "price": 199,
           "available": true,
           "type": "veg",
           "tags": ["Vegetarian"],
-          "image": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=400&fit=crop",
-          "ingredients": ["Falafel", "Hummus", "Tabbouleh", "Olives", "Feta", "Pita"],
-          "nutrition": {
-            "calories": 510,
-            "carbs": 48,
-            "protein": 18,
-            "fat": 26
-          }
+          "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&h=400&fit=crop"
         }
       ]
     },
     {
-      "name": "Burgers",
+      "name": "Grills & Kebabs",
       "items": [
         {
-          "name": "Classic Veggie Burger",
-          "description": "House-made black bean patty, lettuce, tomato, pickles, and special sauce on brioche bun.",
-          "price": 12.99,
-          "available": true,
-          "type": "veg",
-          "tags": ["Vegan Option"],
-          "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=400&fit=crop",
-          "ingredients": ["Black Bean Patty", "Brioche Bun", "Lettuce", "Tomato", "Pickles", "Special Sauce"],
-          "nutrition": {
-            "calories": 480,
-            "carbs": 52,
-            "protein": 16,
-            "fat": 22
-          }
-        },
-        {
-          "name": "Spicy Chicken Burger",
-          "description": "Crispy fried chicken, spicy mayo, coleslaw, and jalapeños on toasted bun.",
-          "price": 14.49,
+          "name": "Al Faham",
+          "description": "Marinated whole chicken grilled to perfection with Lebanese spices, served with garlic sauce and pickles",
           "available": true,
           "type": "non-veg",
-          "tags": ["Spicy", "Popular"],
-          "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop",
-          "ingredients": ["Fried Chicken", "Spicy Mayo", "Coleslaw", "Jalapeños", "Toasted Bun"],
-          "nutrition": {
-            "calories": 650,
-            "carbs": 48,
-            "protein": 32,
-            "fat": 36
-          }
-        }
-      ]
-    },
-    {
-      "name": "Salads",
-      "items": [
-        {
-          "name": "Caesar Salad",
-          "description": "Crisp romaine, parmesan, croutons, and creamy caesar dressing.",
-          "price": 11.99,
-          "available": true,
-          "type": "veg",
-          "tags": ["Classic"],
-          "image": "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400&h=400&fit=crop",
-          "ingredients": ["Romaine Lettuce", "Parmesan", "Croutons", "Caesar Dressing"],
-          "nutrition": {
-            "calories": 320,
-            "carbs": 18,
-            "protein": 12,
-            "fat": 24
-          }
+          "tags": ["Popular", "Smoky"],
+          "image": "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Quarter", "price": 179 },
+            { "name": "Half", "price": 329 },
+            { "name": "Full", "price": 599 }
+          ]
         },
         {
-          "name": "Asian Sesame Salad",
-          "description": "Mixed greens, mandarin oranges, crispy wontons, and sesame ginger dressing.",
-          "price": 12.49,
+          "name": "Seekh Kebab",
+          "description": "Minced lamb kebabs with fresh herbs, onions, and traditional spices, chargrilled on skewers",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Chef's Choice"],
+          "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "4 Pieces", "price": 249 },
+            { "name": "8 Pieces", "price": 449 }
+          ]
+        },
+        {
+          "name": "Malai Tikka",
+          "description": "Creamy and tender chicken tikka marinated in cream, cheese, and mild spices",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Mild", "Creamy"],
+          "image": "https://images.unsplash.com/photo-1610057099431-d73a1c9d2f2f?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "6 Pieces", "price": 279 },
+            { "name": "12 Pieces", "price": 499 }
+          ]
+        },
+        {
+          "name": "Paneer Tikka",
+          "description": "Cottage cheese cubes marinated in tandoori spices, grilled with bell peppers and onions",
           "available": true,
           "type": "veg",
-          "tags": ["Light", "Fresh"],
-          "image": "https://images.unsplash.com/photo-1607532941433-304659e8198a?w=400&h=400&fit=crop",
-          "ingredients": ["Mixed Greens", "Mandarin Oranges", "Crispy Wontons", "Sesame Ginger Dressing"],
-          "nutrition": {
-            "calories": 280,
-            "carbs": 32,
-            "protein": 8,
-            "fat": 14
-          }
+          "tags": ["Vegetarian", "Popular"],
+          "image": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "6 Pieces", "price": 229 },
+            { "name": "12 Pieces", "price": 399 }
+          ]
         }
       ]
     },
     {
-      "name": "Drinks",
+      "name": "Shawarma",
       "items": [
         {
-          "name": "Green Detox Smoothie",
-          "description": "Spinach, banana, apple, ginger, and coconut water.",
-          "price": 7.99,
+          "name": "Chicken Shawarma",
+          "description": "Tender sliced chicken wrapped in fresh pita bread with garlic sauce, pickles, and fresh vegetables",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Bestseller"],
+          "image": "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Regular", "price": 99 },
+            { "name": "Large", "price": 149 },
+            { "name": "Jumbo", "price": 199 }
+          ]
+        },
+        {
+          "name": "Beef Shawarma",
+          "description": "Succulent beef shawarma with tahini sauce, fresh veggies, wrapped in soft Arabic bread",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Premium"],
+          "image": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Regular", "price": 129 },
+            { "name": "Large", "price": 179 },
+            { "name": "Jumbo", "price": 249 }
+          ]
+        },
+        {
+          "name": "Shawarma Plate",
+          "description": "Shawarma meat served on rice with hummus, salad, pickles, and garlic sauce",
+          "available": true,
+          "type": "non-veg",
+          "image": "https://images.unsplash.com/photo-1644704265420-92f9d52c4a8f?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Chicken", "price": 199 },
+            { "name": "Beef", "price": 249 },
+            { "name": "Mixed", "price": 279 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Appetizers",
+      "items": [
+        {
+          "name": "Hummus",
+          "description": "Creamy chickpea dip with tahini, olive oil, and warm pita bread",
+          "price": 149,
           "available": true,
           "type": "veg",
-          "tags": ["Healthy", "Fresh"],
-          "image": "https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=400&h=400&fit=crop",
-          "ingredients": ["Spinach", "Banana", "Apple", "Ginger", "Coconut Water"],
-          "nutrition": {
-            "calories": 180,
-            "carbs": 42,
-            "protein": 4,
-            "fat": 1
-          }
+          "tags": ["Healthy"],
+          "image": "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Falafel",
+          "description": "Crispy fried chickpea patties served with tahini sauce and fresh salad",
+          "available": true,
+          "type": "veg",
+          "tags": ["Vegan", "Popular"],
+          "image": "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "4 Pieces", "price": 99 },
+            { "name": "8 Pieces", "price": 179 }
+          ]
+        },
+        {
+          "name": "Mutton Samosa",
+          "description": "Crispy triangular pastries filled with spiced minced mutton and onions",
+          "available": true,
+          "type": "non-veg",
+          "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "2 Pieces", "price": 79 },
+            { "name": "4 Pieces", "price": 149 }
+          ]
+        },
+        {
+          "name": "Arabic Salad",
+          "description": "Fresh mixed vegetables with lemon, olive oil, and sumac dressing",
+          "price": 99,
+          "available": true,
+          "type": "veg",
+          "tags": ["Fresh", "Healthy"],
+          "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=400&fit=crop"
+        }
+      ]
+    },
+    {
+      "name": "Beverages",
+      "items": [
+        {
+          "name": "Fresh Lime Soda",
+          "description": "Refreshing lime soda with fresh mint leaves",
+          "price": 49,
+          "available": true,
+          "type": "veg",
+          "image": "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=400&fit=crop"
         },
         {
           "name": "Mango Lassi",
-          "description": "Traditional Indian yogurt drink with fresh mango and cardamom.",
-          "price": 5.99,
+          "description": "Creamy yogurt drink blended with fresh mango pulp",
+          "price": 79,
           "available": true,
           "type": "veg",
           "tags": ["Refreshing"],
-          "image": "https://images.unsplash.com/photo-1553530666-ba11a90bb3ae?w=400&h=400&fit=crop",
-          "ingredients": ["Yogurt", "Mango", "Cardamom", "Honey"],
-          "nutrition": {
-            "calories": 220,
-            "carbs": 38,
-            "protein": 8,
-            "fat": 4
-          }
+          "image": "https://images.unsplash.com/photo-1553530666-ba11a90bb3ae?w=400&h=400&fit=crop"
         },
         {
-          "name": "Iced Matcha Latte",
-          "description": "Premium matcha green tea with oat milk over ice.",
-          "price": 6.49,
+          "name": "Arabic Qahwa",
+          "description": "Traditional Arabic coffee with cardamom and dates",
+          "price": 59,
           "available": true,
           "type": "veg",
-          "tags": ["Vegan", "Caffeine"],
-          "image": "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=400&h=400&fit=crop",
-          "ingredients": ["Matcha", "Oat Milk", "Ice"],
-          "nutrition": {
-            "calories": 120,
-            "carbs": 18,
-            "protein": 3,
-            "fat": 4
-          }
+          "tags": ["Traditional"],
+          "image": "https://images.unsplash.com/photo-1578374173705-969cbe6f2d6b?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Jallab",
+          "description": "Sweet date and grape molasses drink with rose water and pine nuts",
+          "price": 89,
+          "available": true,
+          "type": "veg",
+          "tags": ["Signature"],
+          "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=400&fit=crop"
         }
       ]
     },
@@ -193,36 +277,34 @@
       "name": "Desserts",
       "items": [
         {
-          "name": "Vegan Chocolate Mousse",
-          "description": "Rich and creamy avocado chocolate mousse topped with berries.",
-          "price": 8.99,
+          "name": "Kunafa",
+          "description": "Crispy shredded phyllo with sweet cheese filling, rose syrup, and pistachios",
+          "price": 149,
           "available": true,
           "type": "veg",
-          "tags": ["Vegan", "Gluten-Free"],
-          "image": "https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?w=400&h=400&fit=crop",
-          "ingredients": ["Avocado", "Dark Chocolate", "Coconut Cream", "Mixed Berries"],
-          "nutrition": {
-            "calories": 280,
-            "carbs": 28,
-            "protein": 4,
-            "fat": 18
-          }
+          "tags": ["Popular", "Must Try"],
+          "image": "https://images.unsplash.com/photo-1579888944880-d98341245702?w=400&h=400&fit=crop"
         },
         {
-          "name": "Seasonal Fruit Bowl",
-          "description": "Fresh seasonal fruits with honey drizzle and mint.",
-          "price": 6.99,
+          "name": "Baklava",
+          "description": "Layers of crispy phyllo pastry with nuts and honey syrup",
           "available": true,
           "type": "veg",
-          "tags": ["Light", "Healthy"],
-          "image": "https://images.unsplash.com/photo-1564093497595-593b96d80180?w=400&h=400&fit=crop",
-          "ingredients": ["Seasonal Fruits", "Honey", "Fresh Mint"],
-          "nutrition": {
-            "calories": 150,
-            "carbs": 36,
-            "protein": 2,
-            "fat": 0
-          }
+          "tags": ["Classic"],
+          "image": "https://images.unsplash.com/photo-1598110750624-207050c4f28c?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "4 Pieces", "price": 129 },
+            { "name": "8 Pieces", "price": 229 }
+          ]
+        },
+        {
+          "name": "Umm Ali",
+          "description": "Egyptian bread pudding with cream, nuts, raisins, and coconut",
+          "price": 129,
+          "available": true,
+          "type": "veg",
+          "tags": ["Warm", "Comfort"],
+          "image": "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=400&h=400&fit=crop"
         }
       ]
     }

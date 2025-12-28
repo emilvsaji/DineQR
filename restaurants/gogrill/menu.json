@@ -2,28 +2,248 @@
   "currency": "USD",
   "restaurant": {
     "id": "gogrill",
-    "name": "GoGrill Restaurant",
-    "address": "456 Grill Street",
+    "name": "GOGRILL",
+    "tagline": "FUTURISTIC GRILLING EXPERIENCE",
+    "address": "456 Grill Street, Downtown",
     "phone": "+1 555 0456",
-    "openHours": "Mon–Sun 11:00–22:00"
+    "openHours": "11:00 - 23:00"
   },
   "categories": [
     {
-      "name": "Burgers",
+      "name": "Signature Burgers",
       "items": [
         {
-          "name": "Classic Burger",
-          "description": "Beef patty, lettuce, tomato, house sauce.",
-          "price": 10.99,
+          "name": "Neon Classic",
+          "description": "Premium Angus beef, neon-infused cheese sauce, crispy lettuce, tomato, signature GoGrill sauce",
+          "price": 14.99,
           "available": true,
-          "type": "non-veg"
+          "type": "non-veg",
+          "tags": ["Bestseller", "Chef's Choice"],
+          "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop"
         },
         {
-          "name": "Veggie Burger",
-          "description": "Grilled veggie patty, pickles, onions.",
-          "price": 9.49,
+          "name": "Double Smash",
+          "description": "Two smashed beef patties, American cheese, caramelized onions, pickles, mustard mayo",
+          "price": 17.99,
           "available": true,
-          "type": "veg"
+          "type": "non-veg",
+          "tags": ["Popular"],
+          "image": "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Spicy Inferno",
+          "description": "Jalapeño-crusted patty, ghost pepper cheese, sriracha mayo, fire-roasted peppers",
+          "price": 16.49,
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Spicy 🔥"],
+          "image": "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "The Impossible",
+          "description": "Plant-based patty, vegan cheese, fresh veggies, house-made vegan aioli",
+          "price": 15.99,
+          "available": true,
+          "type": "veg",
+          "tags": ["Vegan", "Healthy"],
+          "image": "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Truffle Luxe",
+          "description": "Wagyu beef, black truffle aioli, brie cheese, arugula, caramelized shallots",
+          "price": 24.99,
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Premium", "Limited"],
+          "image": "https://images.unsplash.com/photo-1551360274-ec23f8c40f6a?w=400&h=400&fit=crop"
+        }
+      ]
+    },
+    {
+      "name": "Loaded Fries",
+      "items": [
+        {
+          "name": "Cyber Fries",
+          "description": "Crispy golden fries with LED-blue cheese sauce and cyber-green herb drizzle",
+          "available": true,
+          "type": "veg",
+          "tags": ["Signature"],
+          "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Regular", "price": 5.99 },
+            { "name": "Large", "price": 8.99 },
+            { "name": "Mega", "price": 11.99 }
+          ]
+        },
+        {
+          "name": "Bacon Blaster Fries",
+          "description": "Loaded with crispy bacon bits, cheddar sauce, sour cream, green onions",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Popular"],
+          "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Regular", "price": 7.99 },
+            { "name": "Large", "price": 10.99 },
+            { "name": "Mega", "price": 13.99 }
+          ]
+        },
+        {
+          "name": "Truffle Parmesan Fries",
+          "description": "Hand-cut fries tossed in truffle oil, parmesan, fresh herbs",
+          "price": 9.99,
+          "available": true,
+          "type": "veg",
+          "tags": ["Premium"],
+          "image": "https://images.unsplash.com/photo-1639024471283-03518883512d?w=400&h=400&fit=crop"
+        }
+      ]
+    },
+    {
+      "name": "Chicken",
+      "items": [
+        {
+          "name": "Crispy Chicken Sandwich",
+          "description": "Buttermilk fried chicken, coleslaw, pickles, spicy honey drizzle",
+          "price": 13.99,
+          "available": true,
+          "type": "non-veg",
+          "tags": ["New"],
+          "image": "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Grilled Chicken Bowl",
+          "description": "Herb-marinated grilled chicken, quinoa, roasted vegetables, tahini dressing",
+          "price": 14.49,
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Healthy"],
+          "image": "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Neon Wings",
+          "description": "Crispy wings tossed in your choice of sauce",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Bestseller"],
+          "image": "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "6 Pieces", "price": 9.99 },
+            { "name": "12 Pieces", "price": 17.99 },
+            { "name": "24 Pieces", "price": 32.99 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Steaks & Grills",
+      "items": [
+        {
+          "name": "Prime Ribeye",
+          "description": "12oz USDA Prime ribeye, garlic herb butter, charred vegetables",
+          "price": 38.99,
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Premium", "Chef's Choice"],
+          "image": "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Grilled Lamb Chops",
+          "description": "New Zealand lamb chops, rosemary mint sauce, roasted potatoes",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Premium"],
+          "image": "https://images.unsplash.com/photo-1514516345957-556ca7d90a29?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "3 Pieces", "price": 28.99 },
+            { "name": "5 Pieces", "price": 42.99 }
+          ]
+        },
+        {
+          "name": "BBQ Pork Ribs",
+          "description": "Slow-smoked baby back ribs, house BBQ glaze, coleslaw, cornbread",
+          "available": true,
+          "type": "non-veg",
+          "tags": ["Bestseller"],
+          "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Half Rack", "price": 22.99 },
+            { "name": "Full Rack", "price": 38.99 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shakes & Drinks",
+      "items": [
+        {
+          "name": "Neon Shake",
+          "description": "Vanilla milkshake with color-changing butterfly pea flower, whipped cream",
+          "price": 7.99,
+          "available": true,
+          "type": "veg",
+          "tags": ["Signature", "Instagram"],
+          "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Oreo Blast",
+          "description": "Chocolate shake loaded with crushed Oreos, chocolate drizzle",
+          "price": 8.49,
+          "available": true,
+          "type": "veg",
+          "image": "https://images.unsplash.com/photo-1624781297650-b54e11d2e2b9?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Fresh Lemonade",
+          "description": "House-made lemonade with fresh mint",
+          "available": true,
+          "type": "veg",
+          "image": "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "Regular", "price": 4.49 },
+            { "name": "Large", "price": 5.99 }
+          ]
+        },
+        {
+          "name": "Craft Sodas",
+          "description": "Artisan sodas - Cola, Root Beer, Ginger Beer, Cream Soda",
+          "price": 3.99,
+          "available": true,
+          "type": "veg",
+          "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=400&fit=crop"
+        }
+      ]
+    },
+    {
+      "name": "Desserts",
+      "items": [
+        {
+          "name": "Molten Lava Cake",
+          "description": "Warm chocolate cake with molten center, vanilla ice cream",
+          "price": 9.99,
+          "available": true,
+          "type": "veg",
+          "tags": ["Popular"],
+          "image": "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=400&fit=crop"
+        },
+        {
+          "name": "Churros",
+          "description": "Crispy cinnamon sugar churros with chocolate and caramel dipping sauces",
+          "available": true,
+          "type": "veg",
+          "image": "https://images.unsplash.com/photo-1624371414361-e670edf7de5a?w=400&h=400&fit=crop",
+          "sizes": [
+            { "name": "4 Pieces", "price": 6.99 },
+            { "name": "8 Pieces", "price": 11.99 }
+          ]
+        },
+        {
+          "name": "New York Cheesecake",
+          "description": "Classic creamy cheesecake with berry compote",
+          "price": 8.99,
+          "available": true,
+          "type": "veg",
+          "image": "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400&h=400&fit=crop"
         }
       ]
     }

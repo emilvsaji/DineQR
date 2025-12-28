@@ -1,6 +1,6 @@
 /**
- * DineQR - Modern QR Restaurant Menu App
- * Premium mobile-first menu interface
+ * DineQR - Menu Showcase App
+ * Simplified mobile-first menu interface with item selection for waiter
  */
 
 (function() {
@@ -10,12 +10,16 @@
   const DEFAULT_RESTAURANT = 'ajwa';
   const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23f3f4f6" width="100" height="100"/%3E%3Ctext x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="30"%3E🍽️%3C/text%3E%3C/svg%3E';
 
+  // Futuristic theme restaurants
+  const FUTURISTIC_RESTAURANTS = ['gogrill'];
+
   // ===== STATE =====
   let menuData = null;
-  let cart = [];
+  let selectedItems = []; // { item, size, price }
   let activeCategory = 'all';
   let searchQuery = '';
   let currentItem = null;
+  let currentRestaurantId = '';
 
   // ===== DOM ELEMENTS =====
   const $ = (sel) => document.querySelector(sel);
@@ -26,8 +30,8 @@
     restaurantLogo: $('#restaurantLogo'),
     restaurantName: $('#restaurantName'),
     restaurantTagline: $('#restaurantTagline'),
-    cartBtn: $('#cartBtn'),
-    cartBadge: $('#cartBadge'),
+    selectionBtn: $('#selectionBtn'),
+    selectionCount: $('#selectionCount'),
     searchInput: $('#searchInput'),
     
     // Categories
@@ -47,27 +51,19 @@
     modalName: $('#modalName'),
     modalTags: $('#modalTags'),
     modalDesc: $('#modalDesc'),
-    modalPrice: $('#modalPrice'),
-    modalAddBtn: $('#modalAddBtn'),
-    nutritionSection: $('#nutritionSection'),
-    nutritionCalories: $('#nutritionCalories'),
-    nutritionCarbs: $('#nutritionCarbs'),
-    nutritionProtein: $('#nutritionProtein'),
-    nutritionFat: $('#nutritionFat'),
-    ingredientsSection: $('#ingredientsSection'),
-    ingredientsList: $('#ingredientsList'),
+    sizesSection: $('#sizesSection'),
+    modalSizes: $('#modalSizes'),
+    modalSelectBtn: $('#modalSelectBtn'),
     
-    // Cart
-    cartOverlay: $('#cartOverlay'),
-    cartPanel: $('#cartPanel'),
-    cartClose: $('#cartClose'),
-    cartBody: $('#cartBody'),
-    cartEmpty: $('#cartEmpty'),
-    cartItems: $('#cartItems'),
-    cartTotal: $('#cartTotal'),
-    cartCheckout: $('#cartCheckout'),
-    cartNotes: $('#cartNotes'),
-    tableNumber: $('#tableNumber')
+    // Selection Panel
+    selectionPanel: $('#selectionPanel'),
+    selectionItems: $('#selectionItems'),
+    clearSelectionBtn: $('#clearSelectionBtn'),
+    showWaiterBtn: $('#showWaiterBtn'),
+    
+    // Floating Button
+    floatingBtn: $('#floatingBtn'),
+    floatingBadge: $('#floatingBadge')
   };
 
   // ===== UTILITIES =====
@@ -113,6 +109,17 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  function applyTheme(restaurantId) {
+    const isFuturistic = FUTURISTIC_RESTAURANTS.includes(restaurantId.toLowerCase());
+    if (isFuturistic) {
+      document.documentElement.setAttribute('data-theme', 'futuristic');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0a0a0f');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#22c55e');
+    }
   }
 
   // ===== DATA LOADING =====
@@ -216,6 +223,18 @@
     return items;
   }
 
+  function isItemSelected(itemName) {
+    return selectedItems.some(s => s.item.name === itemName);
+  }
+
+  function getItemPrice(item) {
+    // If item has sizes, return the first size price as default
+    if (item.sizes && item.sizes.length > 0) {
+      return item.sizes[0].price;
+    }
+    return item.price || 0;
+  }
+
   function renderMenuItems() {
     const items = getFilteredItems();
     const currency = menuData?.currency || 'USD';
@@ -252,9 +271,26 @@
         const available = item.available !== false;
         const type = (item.type || '').toLowerCase();
         const imageUrl = item.image || PLACEHOLDER_IMAGE;
+        const selected = isItemSelected(item.name);
+        const displayPrice = getItemPrice(item);
+        
+        // Size options preview
+        let sizesHtml = '';
+        if (item.sizes && item.sizes.length > 0) {
+          sizesHtml = `
+            <div class="menu-card__sizes">
+              ${item.sizes.map(size => `
+                <div class="size-option">
+                  <span class="size-option__name">${escapeHtml(size.name)}</span>
+                  <span class="size-option__price">${formatPrice(size.price, currency)}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
         
         html += `
-          <article class="menu-card ${available ? '' : 'menu-card--unavailable'}" 
+          <article class="menu-card ${available ? '' : 'menu-card--unavailable'} ${selected ? 'menu-card--selected' : ''}" 
                    data-item-id="${escapeHtml(item.name)}">
             <div class="menu-card__image-wrap">
               <img class="menu-card__image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.name)}" 
@@ -266,14 +302,9 @@
               ${item.tags ? `<div class="tags">${item.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
               <h3 class="menu-card__name">${escapeHtml(item.name)}</h3>
               <p class="menu-card__desc">${escapeHtml(item.description || '')}</p>
-              <div class="menu-card__footer">
-                <span class="menu-card__price">${formatPrice(item.price, currency)}</span>
-                ${available ? `
-                  <button class="menu-card__add" data-action="add" aria-label="Add to cart">
-                    <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  </button>
-                ` : '<span class="tag tag--warning">Unavailable</span>'}
-              </div>
+              ${sizesHtml}
+              ${!item.sizes ? `<div style="font-size:15px;font-weight:700;color:var(--primary-dark);margin-top:8px;">${formatPrice(displayPrice, currency)}</div>` : ''}
+              ${!available ? '<span class="tag tag--warning">Unavailable</span>' : ''}
             </div>
           </article>
         `;
@@ -289,12 +320,8 @@
       card.addEventListener('click', (e) => {
         const itemName = card.dataset.itemId;
         const item = findItemByName(itemName);
-        if (item) {
-          if (e.target.closest('[data-action="add"]')) {
-            addToCart(item);
-          } else {
-            openProductModal(item);
-          }
+        if (item && item.available !== false) {
+          openProductModal(item);
         }
       });
     });
@@ -310,19 +337,21 @@
   }
 
   // ===== PRODUCT MODAL =====
+  let selectedSize = null;
+
   function openProductModal(item) {
     currentItem = item;
+    selectedSize = null;
     const currency = menuData?.currency || 'USD';
     
     elements.modalImage.src = item.image || PLACEHOLDER_IMAGE;
     elements.modalImage.onerror = () => { elements.modalImage.src = PLACEHOLDER_IMAGE; };
     elements.modalName.textContent = item.name || 'Product';
     elements.modalDesc.textContent = item.description || '';
-    elements.modalPrice.textContent = formatPrice(item.price, currency);
     
     // Tags
     const tags = [];
-    if ((item.type || '').toLowerCase() === 'veg') tags.push({ text: 'Vegan', class: '' });
+    if ((item.type || '').toLowerCase() === 'veg') tags.push({ text: 'Vegetarian', class: '' });
     if ((item.type || '').toLowerCase().includes('non')) tags.push({ text: 'Non-Veg', class: 'tag--warning' });
     if (item.tags) tags.push(...item.tags.map(t => ({ text: t, class: '' })));
     
@@ -330,26 +359,36 @@
       `<span class="tag ${t.class}">${escapeHtml(t.text)}</span>`
     ).join('');
     
-    // Nutrition
-    if (item.nutrition) {
-      elements.nutritionSection.classList.remove('hidden');
-      elements.nutritionCalories.textContent = item.nutrition.calories || '--';
-      elements.nutritionCarbs.textContent = item.nutrition.carbs ? `${item.nutrition.carbs}g` : '--';
-      elements.nutritionProtein.textContent = item.nutrition.protein ? `${item.nutrition.protein}g` : '--';
-      elements.nutritionFat.textContent = item.nutrition.fat ? `${item.nutrition.fat}g` : '--';
+    // Size options
+    if (item.sizes && item.sizes.length > 0) {
+      elements.sizesSection.classList.remove('hidden');
+      selectedSize = item.sizes[0]; // Default to first size
+      
+      elements.modalSizes.innerHTML = item.sizes.map((size, i) => `
+        <div class="modal__size-option ${i === 0 ? 'modal__size-option--selected' : ''}" 
+             data-size-index="${i}">
+          <div class="modal__size-name">${escapeHtml(size.name)}</div>
+          <div class="modal__size-price">${formatPrice(size.price, currency)}</div>
+        </div>
+      `).join('');
+      
+      // Size click handlers
+      elements.modalSizes.querySelectorAll('.modal__size-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          const idx = parseInt(opt.dataset.sizeIndex);
+          selectedSize = item.sizes[idx];
+          elements.modalSizes.querySelectorAll('.modal__size-option').forEach(o => 
+            o.classList.remove('modal__size-option--selected'));
+          opt.classList.add('modal__size-option--selected');
+        });
+      });
     } else {
-      elements.nutritionSection.classList.add('hidden');
+      elements.sizesSection.classList.add('hidden');
     }
     
-    // Ingredients
-    if (item.ingredients && item.ingredients.length) {
-      elements.ingredientsSection.classList.remove('hidden');
-      elements.ingredientsList.innerHTML = item.ingredients.map(ing => 
-        `<span class="ingredient">${escapeHtml(ing)}</span>`
-      ).join('');
-    } else {
-      elements.ingredientsSection.classList.add('hidden');
-    }
+    // Update button state
+    const isSelected = isItemSelected(item.name);
+    updateModalButton(isSelected);
     
     // Show modal
     elements.modalOverlay.classList.add('modal-overlay--active');
@@ -357,127 +396,127 @@
     document.body.style.overflow = 'hidden';
   }
 
+  function updateModalButton(isSelected) {
+    if (isSelected) {
+      elements.modalSelectBtn.textContent = 'Remove from Selection';
+      elements.modalSelectBtn.classList.add('modal__select-btn--selected');
+    } else {
+      elements.modalSelectBtn.textContent = 'Select Item';
+      elements.modalSelectBtn.classList.remove('modal__select-btn--selected');
+    }
+  }
+
   function closeProductModal() {
     elements.modalOverlay.classList.remove('modal-overlay--active');
     elements.productModal.classList.remove('modal--active');
     document.body.style.overflow = '';
     currentItem = null;
+    selectedSize = null;
   }
 
-  // ===== CART =====
-  function addToCart(item) {
-    const existing = cart.find(c => c.name === item.name);
-    if (existing) {
-      existing.quantity++;
+  // ===== SELECTION MANAGEMENT =====
+  function toggleItemSelection() {
+    if (!currentItem) return;
+    
+    const existingIdx = selectedItems.findIndex(s => s.item.name === currentItem.name);
+    
+    if (existingIdx >= 0) {
+      // Remove from selection
+      selectedItems.splice(existingIdx, 1);
     } else {
-      cart.push({ ...item, quantity: 1 });
-    }
-    updateCartUI();
-    
-    // Visual feedback
-    elements.cartBadge.classList.add('pulse');
-    setTimeout(() => elements.cartBadge.classList.remove('pulse'), 300);
-  }
-
-  function removeFromCart(itemName) {
-    cart = cart.filter(c => c.name !== itemName);
-    updateCartUI();
-  }
-
-  function updateCartQuantity(itemName, delta) {
-    const item = cart.find(c => c.name === itemName);
-    if (item) {
-      item.quantity += delta;
-      if (item.quantity <= 0) {
-        removeFromCart(itemName);
-      } else {
-        updateCartUI();
-      }
-    }
-  }
-
-  function updateCartUI() {
-    const currency = menuData?.currency || 'USD';
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // Badge
-    elements.cartBadge.textContent = totalItems;
-    elements.cartBadge.dataset.count = totalItems;
-    
-    // Cart content
-    if (cart.length === 0) {
-      elements.cartEmpty.classList.remove('hidden');
-      elements.cartItems.classList.add('hidden');
-      elements.cartCheckout.disabled = true;
-    } else {
-      elements.cartEmpty.classList.add('hidden');
-      elements.cartItems.classList.remove('hidden');
-      elements.cartCheckout.disabled = false;
-      
-      elements.cartItems.innerHTML = cart.map(item => `
-        <div class="cart-item">
-          <img class="cart-item__image" src="${escapeHtml(item.image || PLACEHOLDER_IMAGE)}" 
-               alt="${escapeHtml(item.name)}" onerror="this.src='${PLACEHOLDER_IMAGE}'">
-          <div class="cart-item__content">
-            <div class="cart-item__name">${escapeHtml(item.name)}</div>
-            <div class="cart-item__price">${formatPrice(item.price * item.quantity, currency)}</div>
-            <div class="cart-item__controls">
-              <button class="cart-item__qty-btn" data-action="decrease" data-item="${escapeHtml(item.name)}">−</button>
-              <span class="cart-item__qty">${item.quantity}</span>
-              <button class="cart-item__qty-btn" data-action="increase" data-item="${escapeHtml(item.name)}">+</button>
-            </div>
-          </div>
-          <button class="cart-item__remove" data-action="remove" data-item="${escapeHtml(item.name)}">
-            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
-        </div>
-      `).join('');
-      
-      // Add event listeners
-      elements.cartItems.querySelectorAll('[data-action]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const action = btn.dataset.action;
-          const itemName = btn.dataset.item;
-          if (action === 'increase') updateCartQuantity(itemName, 1);
-          if (action === 'decrease') updateCartQuantity(itemName, -1);
-          if (action === 'remove') removeFromCart(itemName);
-        });
+      // Add to selection
+      const price = selectedSize ? selectedSize.price : currentItem.price;
+      selectedItems.push({
+        item: currentItem,
+        size: selectedSize ? selectedSize.name : null,
+        price: price
       });
     }
     
-    elements.cartTotal.textContent = formatPrice(totalPrice, currency);
+    updateSelectionUI();
+    renderMenuItems(); // Re-render to update selected states
+    closeProductModal();
   }
 
-  function openCart() {
-    elements.cartOverlay.classList.add('cart-overlay--active');
-    elements.cartPanel.classList.add('cart-panel--active');
+  function removeFromSelection(itemName) {
+    selectedItems = selectedItems.filter(s => s.item.name !== itemName);
+    updateSelectionUI();
+    renderMenuItems();
+  }
+
+  function clearSelection() {
+    selectedItems = [];
+    updateSelectionUI();
+    renderMenuItems();
+    closeSelectionPanel();
+  }
+
+  function updateSelectionUI() {
+    const count = selectedItems.length;
+    
+    // Update header counter
+    elements.selectionCount.textContent = count;
+    
+    // Update floating button
+    elements.floatingBadge.textContent = count;
+    if (count > 0) {
+      elements.floatingBtn.classList.remove('floating-btn--hidden');
+    } else {
+      elements.floatingBtn.classList.add('floating-btn--hidden');
+    }
+    
+    // Update selection panel
+    updateSelectionPanel();
+  }
+
+  function updateSelectionPanel() {
+    const currency = menuData?.currency || 'USD';
+    
+    if (selectedItems.length === 0) {
+      elements.selectionItems.innerHTML = '<p style="color:var(--text-muted);font-size:14px;">No items selected</p>';
+      return;
+    }
+    
+    elements.selectionItems.innerHTML = selectedItems.map(sel => `
+      <div class="selection-item">
+        <span class="selection-item__name">${escapeHtml(sel.item.name)}</span>
+        ${sel.size ? `<span class="selection-item__size">(${escapeHtml(sel.size)})</span>` : ''}
+        <button class="selection-item__remove" data-item="${escapeHtml(sel.item.name)}">×</button>
+      </div>
+    `).join('');
+    
+    // Add remove handlers
+    elements.selectionItems.querySelectorAll('.selection-item__remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeFromSelection(btn.dataset.item);
+      });
+    });
+  }
+
+  function openSelectionPanel() {
+    elements.selectionPanel.classList.add('selection-panel--active');
     document.body.style.overflow = 'hidden';
   }
 
-  function closeCart() {
-    elements.cartOverlay.classList.remove('cart-overlay--active');
-    elements.cartPanel.classList.remove('cart-panel--active');
+  function closeSelectionPanel() {
+    elements.selectionPanel.classList.remove('selection-panel--active');
     document.body.style.overflow = '';
   }
 
-  function placeOrder() {
-    if (cart.length === 0) return;
+  function showToWaiter() {
+    if (selectedItems.length === 0) return;
     
-    const orderDetails = {
-      items: cart,
-      notes: elements.cartNotes.value,
-      table: elements.tableNumber.textContent,
-      total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    };
+    // Build a simple text summary
+    const lines = selectedItems.map(sel => {
+      let line = sel.item.name;
+      if (sel.size) line += ` (${sel.size})`;
+      return line;
+    });
     
-    console.log('Order placed:', orderDetails);
-    alert('Order placed successfully! 🎉\n\nThank you for your order.');
+    const message = 'Selected Items:\n\n' + lines.join('\n') + '\n\nPlease show this to your waiter.';
     
-    // Clear cart
-    cart = [];
-    updateCartUI();
-    closeCart();
+    alert(message);
   }
 
   // ===== EVENT HANDLERS =====
@@ -488,19 +527,29 @@
       renderMenuItems();
     });
     
-    // Cart button
-    elements.cartBtn.addEventListener('click', openCart);
-    elements.cartClose.addEventListener('click', closeCart);
-    elements.cartOverlay.addEventListener('click', closeCart);
-    elements.cartCheckout.addEventListener('click', placeOrder);
+    // Selection button in header
+    elements.selectionBtn.addEventListener('click', openSelectionPanel);
+    
+    // Floating button
+    elements.floatingBtn.addEventListener('click', openSelectionPanel);
+    
+    // Selection panel
+    elements.clearSelectionBtn.addEventListener('click', clearSelection);
+    elements.showWaiterBtn.addEventListener('click', showToWaiter);
     
     // Product modal
     elements.modalClose.addEventListener('click', closeProductModal);
     elements.modalOverlay.addEventListener('click', closeProductModal);
-    elements.modalAddBtn.addEventListener('click', () => {
-      if (currentItem && currentItem.available !== false) {
-        addToCart(currentItem);
-        closeProductModal();
+    elements.modalSelectBtn.addEventListener('click', toggleItemSelection);
+    
+    // Close selection panel on click outside
+    document.addEventListener('click', (e) => {
+      if (elements.selectionPanel.classList.contains('selection-panel--active')) {
+        if (!elements.selectionPanel.contains(e.target) && 
+            !elements.floatingBtn.contains(e.target) &&
+            !elements.selectionBtn.contains(e.target)) {
+          closeSelectionPanel();
+        }
       }
     });
     
@@ -508,12 +557,9 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeProductModal();
-        closeCart();
+        closeSelectionPanel();
       }
     });
-    
-    // Set random table number
-    elements.tableNumber.textContent = `Table ${Math.floor(Math.random() * 20) + 1}`;
   }
 
   // ===== INIT =====
@@ -521,22 +567,23 @@
     showLoading();
     setupEventListeners();
     
-    const restaurantId = getRestaurantIdFromUrl();
+    currentRestaurantId = getRestaurantIdFromUrl();
+    applyTheme(currentRestaurantId);
     
     // Try to load logo
-    const logoPath = `restaurants/${encodeURIComponent(restaurantId)}/logo.png`;
+    const logoPath = `restaurants/${encodeURIComponent(currentRestaurantId)}/logo.png`;
     elements.restaurantLogo.onerror = () => {
       elements.restaurantLogo.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%2322c55e" width="100" height="100"/%3E%3Ctext x="50" y="60" text-anchor="middle" fill="white" font-size="40"%3E🍽️%3C/text%3E%3C/svg%3E';
     };
     elements.restaurantLogo.src = logoPath;
     
     try {
-      menuData = await loadMenu(restaurantId);
+      menuData = await loadMenu(currentRestaurantId);
       updateHeader(menuData.restaurant);
       renderCategories(menuData.categories || []);
       renderMenuItems();
       showMenu();
-      updateCartUI();
+      updateSelectionUI();
     } catch (error) {
       console.error('Failed to load menu:', error);
       showError(error.message || 'Failed to load menu. Please try again.');
