@@ -11,11 +11,11 @@
   const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23f3f4f6" width="100" height="100"/%3E%3Ctext x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="30"%3E🍽️%3C/text%3E%3C/svg%3E';
 
   // Futuristic theme restaurants
-  const FUTURISTIC_RESTAURANTS = ['gogrill'];
+  const FUTURISTIC_RESTAURANTS = [];
 
   // ===== STATE =====
   let menuData = null;
-  let selectedItems = []; // { item, size, price }
+  let selectedItems = []; // { item, size, price, quantity }
   let activeCategory = 'all';
   let searchQuery = '';
   let currentItem = null;
@@ -25,46 +25,50 @@
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
 
-  const elements = {
-    // Header
-    restaurantLogo: $('#restaurantLogo'),
-    restaurantName: $('#restaurantName'),
-    restaurantTagline: $('#restaurantTagline'),
-    selectionBtn: $('#selectionBtn'),
-    selectionCount: $('#selectionCount'),
-    searchInput: $('#searchInput'),
-    
-    // Categories
-    categoriesScroll: $('#categoriesScroll'),
-    
-    // Main
-    loadingState: $('#loadingState'),
-    errorState: $('#errorState'),
-    errorMessage: $('#errorMessage'),
-    menuContent: $('#menuContent'),
-    
-    // Product Modal
-    modalOverlay: $('#modalOverlay'),
-    productModal: $('#productModal'),
-    modalClose: $('#modalClose'),
-    modalImage: $('#modalImage'),
-    modalName: $('#modalName'),
-    modalTags: $('#modalTags'),
-    modalDesc: $('#modalDesc'),
-    sizesSection: $('#sizesSection'),
-    modalSizes: $('#modalSizes'),
-    modalSelectBtn: $('#modalSelectBtn'),
-    
-    // Selection Panel
-    selectionPanel: $('#selectionPanel'),
-    selectionItems: $('#selectionItems'),
-    clearSelectionBtn: $('#clearSelectionBtn'),
-    showWaiterBtn: $('#showWaiterBtn'),
-    
-    // Floating Button
-    floatingBtn: $('#floatingBtn'),
-    floatingBadge: $('#floatingBadge')
-  };
+  let elements = {};
+
+  function initElements() {
+    elements = {
+      // Header
+      restaurantLogo: $('#restaurantLogo'),
+      restaurantName: $('#restaurantName'),
+      restaurantTagline: $('#restaurantTagline'),
+      selectionBtn: $('#selectionBtn'),
+      selectionCount: $('#selectionCount'),
+      searchInput: $('#searchInput'),
+
+      // Categories
+      categoriesScroll: $('#categoriesScroll'),
+
+      // Main
+      loadingState: $('#loadingState'),
+      errorState: $('#errorState'),
+      errorMessage: $('#errorMessage'),
+      menuContent: $('#menuContent'),
+
+      // Product Modal
+      modalOverlay: $('#modalOverlay'),
+      productModal: $('#productModal'),
+      modalClose: $('#modalClose'),
+      modalImage: $('#modalImage'),
+      modalName: $('#modalName'),
+      modalTags: $('#modalTags'),
+      modalDesc: $('#modalDesc'),
+      sizesSection: $('#sizesSection'),
+      modalSizes: $('#modalSizes'),
+      modalSelectBtn: $('#modalSelectBtn'),
+
+      // Selection Panel
+      selectionPanel: $('#selectionPanel'),
+      selectionItems: $('#selectionItems'),
+      clearSelectionBtn: $('#clearSelectionBtn'),
+      showWaiterBtn: $('#showWaiterBtn'),
+
+      // Floating Button
+      floatingBtn: $('#floatingBtn'),
+      floatingBadge: $('#floatingBadge')
+    };
+  }
 
   // ===== UTILITIES =====
   function getRestaurantIdFromUrl() {
@@ -124,19 +128,84 @@
 
   // ===== DATA LOADING =====
   async function loadMenu(restaurantId) {
+    // Build paths relative to the current page location
+    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+    
     const paths = [
       `restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
+      `./restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
+      `${baseUrl}restaurants/${encodeURIComponent(restaurantId)}/menu.json`,
     ];
 
     for (const path of paths) {
       try {
         const res = await fetch(path, { cache: 'no-store' });
-        if (res.ok) return await res.json();
+        if (res.ok) {
+          const data = await res.json();
+          return data;
+        }
       } catch (e) {
-        console.warn(`Failed to load ${path}`, e);
+        // Silently continue to next path
       }
     }
-    throw new Error(`Menu not found for "${restaurantId}"`);
+
+    // If all fetches fail, return fallback menu
+    return getFallbackMenu(restaurantId);
+  }
+
+  function getFallbackMenu(restaurantId) {
+    const fallbackMenus = {
+      'ajwa': {
+        "currency": "INR",
+        "restaurant": {
+          "id": "ajwa",
+          "name": "Ajwa Kitchen",
+          "tagline": "Authentic Arabian • Fresh • Delicious"
+        },
+        "categories": [
+          {
+            "name": "Mandi",
+            "items": [
+              {
+                "name": "Chicken Mandi",
+                "description": "Tender smoked chicken with aromatic rice",
+                "available": true,
+                "type": "non-veg",
+                "sizes": [
+                  { "name": "Quarter", "price": 199 },
+                  { "name": "Half", "price": 349 },
+                  { "name": "Full", "price": 599 }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      'gogrill': {
+        "currency": "INR",
+        "restaurant": {
+          "id": "gogrill",
+          "name": "GoGrill",
+          "tagline": "Grilled to Perfection"
+        },
+        "categories": [
+          {
+            "name": "Burgers",
+            "items": [
+              {
+                "name": "Classic Burger",
+                "description": "Juicy beef patty with fresh vegetables",
+                "available": true,
+                "type": "non-veg",
+                "price": 299
+              }
+            ]
+          }
+        ]
+      }
+    };
+
+    return fallbackMenus[restaurantId] || fallbackMenus['ajwa'];
   }
 
   // ===== UI UPDATES =====
@@ -399,9 +468,12 @@
   // ===== SELECTION MANAGEMENT =====
   function toggleItemSelection() {
     if (!currentItem) return;
-    
-    const existingIdx = selectedItems.findIndex(s => s.item.name === currentItem.name);
-    
+
+    const sizeKey = selectedSize ? selectedSize.name : null;
+    const existingIdx = selectedItems.findIndex(s =>
+      s.item.name === currentItem.name && s.size === sizeKey
+    );
+
     if (existingIdx >= 0) {
       // Remove from selection
       selectedItems.splice(existingIdx, 1);
@@ -410,18 +482,42 @@
       const price = selectedSize ? selectedSize.price : currentItem.price;
       selectedItems.push({
         item: currentItem,
-        size: selectedSize ? selectedSize.name : null,
-        price: price
+        size: sizeKey,
+        price: price,
+        quantity: 1
       });
     }
-    
+
     updateSelectionUI();
     renderMenuItems(); // Re-render to update selected states
     closeProductModal();
   }
 
-  function removeFromSelection(itemName) {
-    selectedItems = selectedItems.filter(s => s.item.name !== itemName);
+  function updateItemQuantity(itemName, size, delta) {
+    const existingIdx = selectedItems.findIndex(s =>
+      s.item.name === itemName && s.size === size
+    );
+
+    if (existingIdx >= 0) {
+      selectedItems[existingIdx].quantity += delta;
+      if (selectedItems[existingIdx].quantity <= 0) {
+        selectedItems.splice(existingIdx, 1);
+      }
+    }
+
+    updateSelectionUI();
+    renderMenuItems();
+  }
+
+  function removeFromSelection(itemName, size) {
+    const existingIdx = selectedItems.findIndex(s =>
+      s.item.name === itemName && s.size === size
+    );
+
+    if (existingIdx >= 0) {
+      selectedItems.splice(existingIdx, 1);
+    }
+
     updateSelectionUI();
     renderMenuItems();
   }
@@ -453,25 +549,49 @@
 
   function updateSelectionPanel() {
     const currency = menuData?.currency || 'USD';
-    
+
     if (selectedItems.length === 0) {
       elements.selectionItems.innerHTML = '<p style="color:var(--text-muted);font-size:14px;">No items selected</p>';
       return;
     }
-    
+
     elements.selectionItems.innerHTML = selectedItems.map(sel => `
       <div class="selection-item">
-        <span class="selection-item__name">${escapeHtml(sel.item.name)}</span>
-        ${sel.size ? `<span class="selection-item__size">(${escapeHtml(sel.size)})</span>` : ''}
-        <button class="selection-item__remove" data-item="${escapeHtml(sel.item.name)}">×</button>
+        <div class="selection-item__info">
+          <div class="selection-item__name">${escapeHtml(sel.item.name)}</div>
+          ${sel.size ? `<div class="selection-item__size">${escapeHtml(sel.size)}</div>` : ''}
+          <div class="selection-item__price">${formatPrice(sel.price, currency)}</div>
+        </div>
+        <div class="selection-item__controls">
+          <button class="selection-item__qty-btn" data-action="decrease"
+                  data-item="${escapeHtml(sel.item.name)}" data-size="${escapeHtml(sel.size || '')}">−</button>
+          <span class="selection-item__qty">${sel.quantity}</span>
+          <button class="selection-item__qty-btn" data-action="increase"
+                  data-item="${escapeHtml(sel.item.name)}" data-size="${escapeHtml(sel.size || '')}">+</button>
+        </div>
+        <button class="selection-item__remove" data-item="${escapeHtml(sel.item.name)}"
+                data-size="${escapeHtml(sel.size || '')}">×</button>
       </div>
     `).join('');
-    
-    // Add remove handlers
+
+    // Add event handlers
+    elements.selectionItems.querySelectorAll('.selection-item__qty-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        const itemName = btn.dataset.item;
+        const size = btn.dataset.size || null;
+        const delta = action === 'increase' ? 1 : -1;
+        updateItemQuantity(itemName, size, delta);
+      });
+    });
+
     elements.selectionItems.querySelectorAll('.selection-item__remove').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        removeFromSelection(btn.dataset.item);
+        const itemName = btn.dataset.item;
+        const size = btn.dataset.size || null;
+        removeFromSelection(itemName, size);
       });
     });
   }
@@ -489,16 +609,39 @@
   function showToWaiter() {
     if (selectedItems.length === 0) return;
     
-    // Build a simple text summary
-    const lines = selectedItems.map(sel => {
-      let line = sel.item.name;
-      if (sel.size) line += ` (${sel.size})`;
-      return line;
+    const currency = menuData?.currency || 'USD';
+    const restaurantName = menuData?.name || 'Restaurant';
+    const tableNumber = getTableNumber();
+    
+    let summary = `🏪 ${restaurantName}\n`;
+    if (tableNumber) summary += `📋 Table: ${tableNumber}\n`;
+    summary += `⏰ ${new Date().toLocaleString()}\n\n`;
+    
+    summary += '📝 Order Summary:\n';
+    summary += '─'.repeat(30) + '\n';
+    
+    selectedItems.forEach(sel => {
+      summary += `${sel.quantity}x ${sel.item.name}`;
+      if (sel.size) summary += ` (${sel.size})`;
+      summary += ` - ${formatPrice(sel.price * sel.quantity, currency)}\n`;
     });
     
-    const message = 'Selected Items:\n\n' + lines.join('\n') + '\n\nPlease show this to your waiter.';
+    summary += '─'.repeat(30) + '\n';
+    const total = selectedItems.reduce((sum, sel) => sum + (sel.price * sel.quantity), 0);
+    summary += `💰 Total: ${formatPrice(total, currency)}\n\n`;
     
-    alert(message);
+    summary += '👨‍🍳 Please confirm your order with the waiter.';
+    
+    // Copy to clipboard and show alert
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(summary).then(() => {
+        alert('Order summary copied to clipboard!\n\n' + summary);
+      }).catch(() => {
+        alert('Order summary:\n\n' + summary);
+      });
+    } else {
+      alert('Order summary:\n\n' + summary);
+    }
   }
 
   // ===== EVENT HANDLERS =====
@@ -546,19 +689,22 @@
 
   // ===== INIT =====
   async function init() {
+    // Initialize DOM elements first
+    initElements();
+
     showLoading();
     setupEventListeners();
-    
+
     currentRestaurantId = getRestaurantIdFromUrl();
     applyTheme(currentRestaurantId);
-    
+
     // Try to load logo
     const logoPath = `restaurants/${encodeURIComponent(currentRestaurantId)}/logo.png`;
     elements.restaurantLogo.onerror = () => {
       elements.restaurantLogo.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%2322c55e" width="100" height="100"/%3E%3Ctext x="50" y="60" text-anchor="middle" fill="white" font-size="40"%3E🍽️%3C/text%3E%3C/svg%3E';
     };
     elements.restaurantLogo.src = logoPath;
-    
+
     try {
       menuData = await loadMenu(currentRestaurantId);
       updateHeader(menuData.restaurant);
@@ -568,10 +714,20 @@
       updateSelectionUI();
     } catch (error) {
       console.error('Failed to load menu:', error);
-      showError(error.message || 'Failed to load menu. Please try again.');
+      // Use fallback menu on error
+      menuData = getFallbackMenu(currentRestaurantId);
+      updateHeader(menuData.restaurant);
+      renderCategories(menuData.categories || []);
+      renderMenuItems();
+      showMenu();
+      updateSelectionUI();
     }
   }
 
-  // Start
-  init();
+  // Start when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
