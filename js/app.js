@@ -274,36 +274,18 @@
         const selected = isItemSelected(item.name);
         const displayPrice = getItemPrice(item);
         
-        // Size options preview
-        let sizesHtml = '';
-        if (item.sizes && item.sizes.length > 0) {
-          sizesHtml = `
-            <div class="menu-card__sizes">
-              ${item.sizes.map(size => `
-                <div class="size-option">
-                  <span class="size-option__name">${escapeHtml(size.name)}</span>
-                  <span class="size-option__price">${formatPrice(size.price, currency)}</span>
-                </div>
-              `).join('')}
-            </div>
-          `;
-        }
-        
         html += `
           <article class="menu-card ${available ? '' : 'menu-card--unavailable'} ${selected ? 'menu-card--selected' : ''}" 
                    data-item-id="${escapeHtml(item.name)}">
             <div class="menu-card__image-wrap">
               <img class="menu-card__image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.name)}" 
                    onerror="this.src='${PLACEHOLDER_IMAGE}'">
-              ${type === 'veg' ? '<span class="menu-card__badge menu-card__badge--veg">🌱</span>' : ''}
-              ${type === 'non-veg' || type === 'nonveg' ? '<span class="menu-card__badge menu-card__badge--nonveg">🍖</span>' : ''}
             </div>
             <div class="menu-card__content">
               ${item.tags ? `<div class="tags">${item.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
               <h3 class="menu-card__name">${escapeHtml(item.name)}</h3>
               <p class="menu-card__desc">${escapeHtml(item.description || '')}</p>
-              ${sizesHtml}
-              ${!item.sizes ? `<div style="font-size:15px;font-weight:700;color:var(--primary-dark);margin-top:8px;">${formatPrice(displayPrice, currency)}</div>` : ''}
+              <div style="font-size:15px;font-weight:700;color:var(--primary-dark);margin-top:8px;">${formatPrice(displayPrice, currency)}</div>
               ${!available ? '<span class="tag tag--warning">Unavailable</span>' : ''}
             </div>
           </article>
