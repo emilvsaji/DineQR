@@ -270,39 +270,45 @@
     const name = restaurant?.name || 'Restaurant';
     const tagline = restaurant?.tagline || restaurant?.openHours || 'Delicious • Fresh • Quality';
     
-    elements.restaurantName.textContent = name;
-    elements.restaurantTagline.textContent = tagline;
+    if (elements.restaurantName) elements.restaurantName.textContent = name;
+    if (elements.restaurantTagline) elements.restaurantTagline.textContent = tagline;
     document.title = `${name} - Menu`;
 
     // Logo
-    if (restaurant?.logoUrl) {
+    if (restaurant?.logoUrl && elements.restaurantLogo) {
       elements.restaurantLogo.src = restaurant.logoUrl;
     }
 
     // Address
-    if (restaurant?.address) {
-      elements.restaurantAddress.textContent = '📍 ' + restaurant.address;
-      elements.restaurantAddress.classList.remove('hidden');
-    } else {
-      elements.restaurantAddress.classList.add('hidden');
+    if (elements.restaurantAddress) {
+      if (restaurant?.address) {
+        elements.restaurantAddress.textContent = '📍 ' + restaurant.address;
+        elements.restaurantAddress.classList.remove('hidden');
+      } else {
+        elements.restaurantAddress.classList.add('hidden');
+      }
     }
 
     // Hours
-    const hours = restaurant?.hours || restaurant?.openHours;
-    if (hours) {
-      elements.restaurantHours.textContent = '🕒 ' + hours;
-      elements.restaurantHours.classList.remove('hidden');
-    } else {
-      elements.restaurantHours.classList.add('hidden');
+    if (elements.restaurantHours) {
+      const hours = restaurant?.hours || restaurant?.openHours;
+      if (hours) {
+        elements.restaurantHours.textContent = '🕒 ' + hours;
+        elements.restaurantHours.classList.remove('hidden');
+      } else {
+        elements.restaurantHours.classList.add('hidden');
+      }
     }
 
     // Info / Phone
-    const info = restaurant?.info || restaurant?.phone;
-    if (info) {
-      elements.restaurantInfo.textContent = info;
-      elements.restaurantInfo.classList.remove('hidden');
-    } else {
-      elements.restaurantInfo.classList.add('hidden');
+    if (elements.restaurantInfo) {
+      const info = restaurant?.info || restaurant?.phone;
+      if (info) {
+        elements.restaurantInfo.textContent = info;
+        elements.restaurantInfo.classList.remove('hidden');
+      } else {
+        elements.restaurantInfo.classList.add('hidden');
+      }
     }
   }
 
