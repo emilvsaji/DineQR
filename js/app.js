@@ -16,7 +16,7 @@
   const restaurantLogoEl = document.getElementById('restaurantLogo');
 
   // Default restaurant to show when no ID is specified
-  const DEFAULT_RESTAURANT = 'spice-garden';
+  const DEFAULT_RESTAURANT = 'ajwa';
 
   /** @returns {string} */
   function getRestaurantIdFromUrl() {
