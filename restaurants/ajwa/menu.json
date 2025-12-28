@@ -1,11 +1,11 @@
 {
   "currency": "USD",
   "restaurant": {
-    "id": "spice-garden",
-    "name": "Spice Garden",
-    "address": "12 Market Street",
-    "phone": "+1 555 0100",
-    "openHours": "Daily 10:00–22:00"
+    "id": "ajwa",
+    "name": "Ajwa Restaurant",
+    "address": "123 Main Street",
+    "phone": "+1 555 0123",
+    "openHours": "Daily 9:00–23:00"
   },
   "categories": [
     {
