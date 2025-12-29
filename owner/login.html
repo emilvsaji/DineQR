@@ -1,53 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#22c55e" />
-  <title>DineQR Owner Login</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- Reuse existing design tokens + base styles -->
-  <link rel="stylesheet" href="../css/styles.css" />
-  <!-- Owner-specific, minimal overrides -->
-  <link rel="stylesheet" href="./owner.css?v=20251229" />
-
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Owner Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="owner.css?v=2">
 </head>
 <body data-page="login">
-  <div class="app">
-    <main class="owner-shell">
-      <header class="owner-header">
-        <h1 class="owner-title">Owner Login</h1>
-        <p class="owner-subtitle">Sign in to manage your restaurant menu.</p>
-      </header>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-icon">🍽️</div>
+                <h1 class="login-title">DineQR</h1>
+                <p class="login-subtitle">Restaurant Management System</p>
+            </div>
 
-      <section class="card">
-        <form id="loginForm" class="form" autocomplete="on">
-          <label class="field">
-            <span class="field__label">Email</span>
-            <input class="field__input" id="email" type="email" inputmode="email" autocomplete="email" placeholder="owner@example.com" required />
-          </label>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input 
+                        class="form-input" 
+                        id="email" 
+                        type="email" 
+                        inputmode="email" 
+                        autocomplete="email" 
+                        placeholder="owner@example.com" 
+                        required 
+                    />
+                </div>
 
-          <label class="field">
-            <span class="field__label">Password</span>
-            <input class="field__input" id="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
-          </label>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input 
+                        class="form-input" 
+                        id="password" 
+                        type="password" 
+                        autocomplete="current-password" 
+                        placeholder="Enter your password" 
+                        required 
+                    />
+                </div>
 
-          <button class="btn btn--primary" id="loginBtn" type="submit">Log in</button>
+                <button class="login-btn" id="loginBtn" type="submit" data-idle-text="Sign In">
+                    <span id="loginBtnText">Sign In</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"></path>
+                    </svg>
+                </button>
 
-          <p class="helper" id="loginMessage" role="status" aria-live="polite"></p>
-        </form>
-      </section>
+                <p class="login-message" id="loginMessage" role="status" aria-live="polite"></p>
+            </form>
 
-      <p class="footer-note">Powered by DineQR</p>
-    </main>
-  </div>
+            <div class="login-footer">
+                <p>Powered by DineQR © 2025</p>
+            </div>
+        </div>
+    </div>
 
-  <!-- Firebase Auth + Firestore wiring lives in owner.js -->
-  <script type="module" src="./owner.js?v=20251229"></script>
+    <script type="module" src="./owner.js?v=20251229"></script>
 </body>
 </html>

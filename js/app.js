@@ -3,6 +3,17 @@
  * Simplified mobile-first menu interface with item selection for waiter
  */
 
+import {
+  getFirestore,
+  collection,
+  query,
+  getDocs,
+  doc,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+import { db } from "./firebase.js";
+
 (function() {
   'use strict';
 
@@ -131,15 +142,23 @@
 
   // ===== DATA LOADING =====
   async function loadMenu(restaurantId) {
-    // Build paths relative to the current page location
-    // Handle both root deployment and subdirectory deployment (like GitHub Pages)
+    try {
+      console.log('🚀 Loading menu for restaurant:', restaurantId);
+      
+      // First, try to load from Firestore
+      const firestoreMenu = await loadMenuFromFirestore(restaurantId);
+      if (firestoreMenu) {
+        console.log('✅ Successfully loaded menu from Firestore with', firestoreMenu.categories.length, 'categories');
+        return firestoreMenu;
+      }
+    } catch (error) {
+      console.log('⚠️ Firestore loading failed, falling back to JSON:', error.message);
+    }
+
+    // Fallback to JSON files
+    console.log('📄 Attempting to load from JSON files...');
     const pathname = window.location.pathname;
-    
-    // For GitHub Pages: /DineQR/ or /repo-name/
-    // For root: /
     let basePath = pathname.substring(0, pathname.lastIndexOf('/') + 1);
-    
-    // Ensure basePath ends with /
     if (!basePath.endsWith('/')) basePath += '/';
     
     const paths = [
@@ -159,14 +178,12 @@
         console.log('Response status:', res.status, 'for path:', path);
         
         if (res.ok) {
-          // Check if response is actually JSON (not an HTML error page)
           const contentType = res.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
             const data = await res.json();
             console.log('Successfully loaded menu from:', path);
             return data;
           } else {
-            // Try to parse anyway in case content-type header is wrong
             const text = await res.text();
             try {
               const data = JSON.parse(text);
@@ -179,13 +196,122 @@
         }
       } catch (e) {
         console.log('Failed to fetch from:', path, e.message);
-        // Silently continue to next path
       }
     }
 
     console.log('All paths failed, using fallback menu');
-    // If all fetches fail, return fallback menu
     return getFallbackMenu(restaurantId);
+  }
+
+  async function loadMenuFromFirestore(restaurantId) {
+    try {
+      console.log('🔍 Loading from Firestore: restaurants/' + restaurantId + '/menuItems');
+      
+      // Get restaurant info
+      const restaurantDoc = await getDoc(doc(db, 'restaurants', restaurantId));
+      if (!restaurantDoc.exists()) {
+        console.log('⚠️ Restaurant document not found in Firestore');
+        return null;
+      }
+
+      const restaurantData = restaurantDoc.data();
+      console.log('✅ Restaurant found:', restaurantData.name || restaurantId);
+
+      // Get menu items
+      const menuItemsRef = collection(db, 'restaurants', restaurantId, 'menuItems');
+      const menuItemsSnapshot = await getDocs(menuItemsRef);
+
+      console.log('📊 Found', menuItemsSnapshot.size, 'items in Firestore');
+
+      if (menuItemsSnapshot.empty) {
+        console.log('⚠️ No menu items found in Firestore, will try JSON fallback');
+        return null;
+      }
+
+      // Group items by category
+      const categoriesMap = {};
+      const menuItems = [];
+
+      menuItemsSnapshot.forEach((docSnap) => {
+        const item = { id: docSnap.id, ...docSnap.data() };
+        menuItems.push(item);
+        console.log('  📝 Item:', item.name, '- Category:', item.category, '- Price: ₹' + item.price);
+
+        const categoryKey = item.category || 'other';
+        if (!categoriesMap[categoryKey]) {
+          categoriesMap[categoryKey] = {
+            id: categoryKey,
+            name: categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1).replace(/-/g, ' '),
+            items: []
+          };
+        }
+
+        // Convert Firestore item to menu format
+        const menuItem = {
+          id: item.id,
+          name: item.name,
+          description: item.description || '',
+          price: item.price,
+          image: item.image || '',
+          available: item.available !== false,
+          type: item.type || 'veg',
+          tags: [],
+          rating: item.rating || 4.5,
+          prepTime: item.prepTime || '',
+          deliveryCount: item.deliveryCount || 0,
+        };
+        
+        // Add tags based on type
+        if (item.type === 'bestseller' || item.type === 'Best Seller') {
+          menuItem.tags.push('Bestseller');
+        }
+        if (item.type === 'new' || item.type === 'New Item') {
+          menuItem.tags.push('New');
+        }
+
+        categoriesMap[categoryKey].items.push(menuItem);
+      });
+
+      // Convert categories map to array
+      const categories = Object.values(categoriesMap);
+      console.log('📂 Organized into', categories.length, 'categories:', categories.map(c => c.name).join(', '));
+
+      return {
+        currency: restaurantData.currency || 'INR',
+        restaurant: {
+          id: restaurantId,
+          name: restaurantData.name || 'Restaurant',
+          tagline: restaurantData.tagline || '',
+          logoUrl: restaurantData.logoUrl || '',
+          address: restaurantData.address || '',
+          phone: restaurantData.phone || '',
+          openHours: restaurantData.openHours || ''
+        },
+        categories: categories
+      };
+    } catch (error) {
+      console.error('❌ Error loading from Firestore:', error);
+      return null;
+    }
+  }
+
+      return {
+        currency: 'INR',
+        restaurant: {
+          id: restaurantId,
+          name: restaurantData.name || 'Restaurant',
+          tagline: restaurantData.tagline || 'Delicious • Fresh • Quality',
+          address: restaurantData.address || '',
+          hours: restaurantData.hours || '',
+          logo: restaurantData.logo || '',
+        },
+        categories: categories
+      };
+
+    } catch (error) {
+      console.error('Error loading from Firestore:', error);
+      return null;
+    }
   }
 
   function getFallbackMenu(restaurantId) {

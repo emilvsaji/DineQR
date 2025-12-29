@@ -53,7 +53,9 @@ function setText(el, text) {
 function setBusy(buttonEl, isBusy, busyText) {
   if (!buttonEl) return;
   buttonEl.disabled = isBusy;
-  if (busyText) buttonEl.textContent = isBusy ? busyText : buttonEl.dataset.idleText;
+  if (busyText && buttonEl.dataset.idleText) {
+    buttonEl.textContent = isBusy ? busyText : buttonEl.dataset.idleText;
+  }
 }
 
 function debounce(fn, waitMs) {
@@ -105,42 +107,110 @@ async function copyToClipboard(text) {
 // Login
 // -----------------------------
 function initLoginPage() {
+  console.log('Initializing login page...');
+  
   const form = $("#loginForm");
   const emailEl = $("#email");
   const passwordEl = $("#password");
   const loginBtn = $("#loginBtn");
+  const loginBtnText = $("#loginBtnText");
   const msgEl = $("#loginMessage");
 
-  if (loginBtn) loginBtn.dataset.idleText = loginBtn.textContent;
-
-  // If already signed in, go straight to dashboard.
-  onAuthStateChanged(auth, (user) => {
-    if (user) redirectTo("./dashboard.html");
+  console.log('Form elements:', { 
+    form: !!form, 
+    emailEl: !!emailEl, 
+    passwordEl: !!passwordEl, 
+    loginBtn: !!loginBtn,
+    msgEl: !!msgEl 
   });
 
-  form?.addEventListener("submit", async (e) => {
+  if (loginBtn) loginBtn.dataset.idleText = "Sign In";
+
+  // Check if user is already logged in
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // User is already logged in, redirect to dashboard
+      console.log('User already logged in:', user.email);
+      redirectTo("./dashboard.html");
+    } else {
+      console.log('No user logged in');
+    }
+  });
+
+  if (!form) {
+    console.error('Login form not found!');
+    return;
+  }
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    console.log('Form submitted');
 
     setText(msgEl, "");
     const email = String(emailEl?.value || "").trim();
     const password = String(passwordEl?.value || "");
 
+    console.log('Login attempt - Email:', email, 'Password length:', password.length);
+
     if (!email || !password) {
-      setText(msgEl, "Please enter email and password.");
+      const msg = "Please enter email and password.";
+      setText(msgEl, msg);
+      console.log(msg);
       return;
     }
 
     try {
-      setBusy(loginBtn, true, "Logging in…");
-      await signInWithEmailAndPassword(auth, email, password);
-      redirectTo("./dashboard.html");
+      if (loginBtn) loginBtn.disabled = true;
+      if (loginBtnText) loginBtnText.textContent = "Logging in...";
+      
+      console.log('Calling signInWithEmailAndPassword...');
+      
+      // Sign in with Firebase Authentication
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      console.log('✅ Login successful! User:', user.email, 'UID:', user.uid);
+      
+      // Success - redirect to dashboard
+      setText(msgEl, "Login successful! Redirecting...");
+      msgEl.style.color = "#10B981";
+      
+      setTimeout(() => {
+        console.log('Redirecting to dashboard...');
+        redirectTo("./dashboard.html");
+      }, 1000);
+      
     } catch (err) {
-      const msg = err?.message ? String(err.message) : "Login failed";
+      console.error('❌ Login error:', err);
+      console.error('Error code:', err.code);
+      console.error('Error message:', err.message);
+      
+      let msg = "Login failed. Please check your credentials.";
+      
+      // Provide more specific error messages
+      if (err.code === 'auth/user-not-found') {
+        msg = "No account found with this email address.";
+      } else if (err.code === 'auth/wrong-password') {
+        msg = "Incorrect password. Please try again.";
+      } else if (err.code === 'auth/invalid-email') {
+        msg = "Invalid email address format.";
+      } else if (err.code === 'auth/too-many-requests') {
+        msg = "Too many failed attempts. Please try again later.";
+      } else if (err.code === 'auth/invalid-credential') {
+        msg = "Invalid email or password. Please try again.";
+      } else if (err.message) {
+        msg = err.message;
+      }
+      
       setText(msgEl, msg);
-    } finally {
-      setBusy(loginBtn, false, "Logging in…");
+      msgEl.style.color = "#e53e3e";
+      
+      if (loginBtn) loginBtn.disabled = false;
+      if (loginBtnText) loginBtnText.textContent = "Sign In";
     }
   });
+  
+  console.log('Login page initialized successfully');
 }
 
 // -----------------------------
@@ -155,6 +225,138 @@ function initDashboardPage() {
   const qrWrap = $("#qrWrap");
   const qrCanvas = $("#qrCanvas");
   const topStatus = $("#topStatus");
+  
+  // Logout button handler
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        console.log('User signed out successfully');
+        redirectTo('./login.html');
+      } catch (error) {
+        console.error('Error signing out:', error);
+        alert('Error logging out. Please try again.');
+      }
+    });
+  }
+  
+  // Profile dropdown handlers
+  const profileAvatar = $('#profileAvatar');
+  const profileDropdown = $('#profileDropdown');
+  const profileRestaurantNameEl = $('#profileRestaurantName');
+  const profileEmailEl = $('#profileEmail');
+  const viewMenuLink = $('#viewMenuLink');
+  const editProfileLink = $('#editProfileLink');
+  const profileLogoutBtn = $('#profileLogoutBtn');
+  
+  // Toggle dropdown
+  if (profileAvatar && profileDropdown) {
+    profileAvatar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.classList.toggle('active');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!profileDropdown.contains(e.target) && !profileAvatar.contains(e.target)) {
+        profileDropdown.classList.remove('active');
+      }
+    });
+  }
+  
+  // View public menu link
+  if (viewMenuLink) {
+    viewMenuLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Open public menu in new tab
+      window.open('../index.html', '_blank');
+    });
+  }
+  
+  // Edit profile link
+  if (editProfileLink) {
+    editProfileLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Edit profile feature coming soon!');
+      // TODO: Open edit modal
+    });
+  }
+  
+  // Profile logout button
+  if (profileLogoutBtn) {
+    profileLogoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+        console.log('User signed out successfully');
+        redirectTo('./login.html');
+      } catch (error) {
+        console.error('Error signing out:', error);
+        alert('Error logging out. Please try again.');
+      }
+    });
+  }
+  
+  // Category filtering
+  const categoryCards = document.querySelectorAll('.category-card');
+  const foodCards = document.querySelectorAll('.food-card');
+  
+  if (categoryCards.length > 0 && foodCards.length > 0) {
+    categoryCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const category = card.dataset.category;
+        
+        // Update active state
+        categoryCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        
+        // Filter food cards
+        if (category === 'all') {
+          // Show all food cards
+          foodCards.forEach(foodCard => {
+            foodCard.style.display = 'block';
+          });
+        } else {
+          // Show only matching category
+          foodCards.forEach(foodCard => {
+            if (foodCard.dataset.category === category) {
+              foodCard.style.display = 'block';
+            } else {
+              foodCard.style.display = 'none';
+            }
+          });
+        }
+      });
+    });
+  }
+  
+  // Search functionality
+  const searchInput = document.querySelector('.search-input');
+  
+  if (searchInput && foodCards.length > 0) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      
+      // Reset category to "All" when searching
+      if (searchTerm) {
+        categoryCards.forEach(c => c.classList.remove('active'));
+        const allCategory = document.querySelector('[data-category="all"]');
+        if (allCategory) allCategory.classList.add('active');
+      }
+      
+      // Filter food cards by search term
+      foodCards.forEach(foodCard => {
+        const foodName = foodCard.querySelector('.food-name')?.textContent.toLowerCase() || '';
+        const foodDescription = foodCard.querySelector('.food-description')?.textContent.toLowerCase() || '';
+        
+        if (foodName.includes(searchTerm) || foodDescription.includes(searchTerm)) {
+          foodCard.style.display = 'block';
+        } else {
+          foodCard.style.display = 'none';
+        }
+      });
+    });
+  }
 
   const setupWrap = $("#setupWrap");
   const setupRestaurantNameEl = $("#setupRestaurantName");
@@ -180,29 +382,55 @@ function initDashboardPage() {
     itemsByCategory: new Map(), // catId -> Map(itemId -> item)
   };
 
-  function setStatus(text) {
-    setText(topStatus, text || "");
-  }
+  // Protect dashboard - require authentication
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      // No user logged in, redirect to login
+      console.log('No user logged in, redirecting to login');
+      redirectTo("./login.html");
+      return;
+    }
+    
+    console.log('User authenticated:', user.email);
+    
+    // User is authenticated
+    currentUser = user;
+    
+    // Update profile dropdown info
+    const profileEmailEl = $('#profileEmail');
+    if (profileEmailEl) {
+      profileEmailEl.textContent = user.email;
+    }
+    
+    loadDashboard();
+  });
 
-  function setMenuStatus(text) {
-    if (!menuStatus) return;
-    menuStatus.textContent = text || "";
-    menuStatus.style.display = text ? "block" : "none";
-  }
+  async function loadDashboard() {
+    if (!currentUser) return;
 
-  function showSetup(message) {
-    if (setupWrap) setupWrap.hidden = false;
-    if (menuWrap) menuWrap.hidden = true;
-    setText(restaurantNameEl, "Owner");
-    setText(setupStatus, message || "");
-    setupRestaurantIdEl?.focus();
-  }
+    function setStatus(text) {
+      setText(topStatus, text || "");
+    }
 
-  function hideSetup() {
-    if (setupWrap) setupWrap.hidden = true;
-    if (menuWrap) menuWrap.hidden = false;
-    setText(setupStatus, "");
-  }
+    function setMenuStatus(text) {
+      if (!menuStatus) return;
+      menuStatus.textContent = text || "";
+      menuStatus.style.display = text ? "block" : "none";
+    }
+
+    function showSetup(message) {
+      if (setupWrap) setupWrap.hidden = false;
+      if (menuWrap) menuWrap.hidden = true;
+      setText(restaurantNameEl, "Owner");
+      setText(setupStatus, message || "");
+      setupRestaurantIdEl?.focus();
+    }
+
+    function hideSetup() {
+      if (setupWrap) setupWrap.hidden = true;
+      if (menuWrap) menuWrap.hidden = false;
+      setText(setupStatus, "");
+    }
 
   function render() {
     if (!categoriesEl) return;
@@ -797,30 +1025,21 @@ function initDashboardPage() {
     }
   });
 
-  onAuthStateChanged(auth, async (user) => {
-    clearRealtimeListeners();
-    currentUser = user;
-
-    if (!user) {
-      redirectTo("./login.html");
+  // Initialize dashboard for authenticated user
+  try {
+    setMenuStatus("Loading menu…");
+    restaurantId = await resolveRestaurantIdForOwner(currentUser);
+    if (!restaurantId) {
+      setMenuStatus("");
+      showSetup("No restaurant linked yet.");
       return;
     }
-
-    try {
-      setMenuStatus("Loading menu…");
-      restaurantId = await resolveRestaurantIdForOwner(user);
-      if (!restaurantId) {
-        setMenuStatus("");
-        showSetup("No restaurant linked yet.");
-        return;
-      }
-      startRealtime();
-    } catch (e) {
-      console.error(e);
-      setMenuStatus("");
-      showSetup("Failed to load owner profile.");
-    }
-  });
+    startRealtime();
+  } catch (e) {
+    console.error(e);
+    setMenuStatus("");
+    showSetup("Failed to load owner profile.");
+  }
 
   setupSaveBtn?.addEventListener("click", async () => {
     if (!currentUser) return;
@@ -870,6 +1089,7 @@ function initDashboardPage() {
       setStatus("Failed to add category.");
     }
   });
+  } // End of loadDashboard function
 }
 
 // -----------------------------
@@ -877,4 +1097,143 @@ function initDashboardPage() {
 // -----------------------------
 const page = getPage();
 if (page === "login") initLoginPage();
-if (page === "dashboard") initDashboardPage();
+if (page === "dashboard") {
+  initDashboardPage();
+  
+  // Add Menu Modal Functionality
+  // Use setTimeout to ensure DOM is ready
+  setTimeout(() => {
+    const addMenuBtn = document.querySelector('.add-menu-btn');
+    const addMenuModal = $('#addMenuModal');
+    const addMenuOverlay = $('#addMenuOverlay');
+    const closeAddMenuBtn = $('#closeAddMenuBtn');
+    const cancelAddMenuBtn = $('#cancelAddMenuBtn');
+    const addMenuForm = $('#addMenuForm');
+
+    function openAddMenuModal() {
+      if (addMenuModal && addMenuOverlay) {
+        addMenuModal.classList.add('active');
+        addMenuOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeAddMenuModal() {
+      if (addMenuModal && addMenuOverlay) {
+        addMenuModal.classList.remove('active');
+        addMenuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        if (addMenuForm) addMenuForm.reset();
+      }
+    }
+
+    if (addMenuBtn) {
+      addMenuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Add Menu button clicked');
+        openAddMenuModal();
+      });
+    }
+
+    if (closeAddMenuBtn) {
+      closeAddMenuBtn.addEventListener('click', closeAddMenuModal);
+    }
+
+    if (cancelAddMenuBtn) {
+      cancelAddMenuBtn.addEventListener('click', closeAddMenuModal);
+    }
+
+    if (addMenuOverlay) {
+      addMenuOverlay.addEventListener('click', closeAddMenuModal);
+    }
+
+    // Handle form submission
+    if (addMenuForm) {
+      addMenuForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = $('#submitAddMenuBtn');
+        const originalText = submitBtn?.textContent;
+
+        try {
+          // Disable submit button
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding...';
+          }
+
+          // Get form values
+          const foodData = {
+            name: $('#foodName')?.value.trim(),
+            category: $('#foodCategory')?.value.trim(),
+            price: parseFloat($('#foodPrice')?.value) || 0,
+            prepTime: $('#foodPrepTime')?.value.trim(),
+            rating: parseFloat($('#foodRating')?.value) || 4.5,
+            description: $('#foodDescription')?.value.trim() || '',
+            image: $('#foodImage')?.value.trim() || '',
+            type: $('#foodType')?.value.trim(),
+            deliveryCount: parseInt($('#foodDeliveryCount')?.value) || 0,
+            available: $('#foodAvailable')?.checked !== false,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          };
+
+          // Validate required fields
+          if (!foodData.name || !foodData.category || !foodData.price) {
+            alert('Please fill in all required fields');
+            return;
+          }
+
+          // Get current user's restaurant ID
+          const user = auth.currentUser;
+          if (!user) {
+            alert('Please login first');
+            return;
+          }
+
+          const ownerDoc = await getDoc(doc(db, 'owners', user.uid));
+          const restaurantId = ownerDoc.data()?.restaurantId || 'ajwa'; // Default to ajwa if not set
+
+          // Add to Firestore - Save to menuItems collection
+          // This matches the structure that index.html expects
+          const menuItemsRef = collection(db, 'restaurants', restaurantId, 'menuItems');
+          await addDoc(menuItemsRef, {
+            name: foodData.name,
+            category: foodData.category,
+            description: foodData.description,
+            price: foodData.price,
+            type: foodData.type || 'regular',
+            available: foodData.available,
+            rating: foodData.rating,
+            prepTime: foodData.prepTime,
+            image: foodData.image,
+            deliveryCount: foodData.deliveryCount,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+
+          // Show success message
+          alert('✅ Item added successfully!\\n\\n📱 View it on your menu:\\nhttp://localhost:8000/index.html\\n\\n💡 Tip: Open the browser console (F12) to see Firestore logs!');
+          
+          // Close modal and reset form
+          closeAddMenuModal();
+
+          // Log success with details
+          console.log('✅ Menu item added to Firestore at restaurants/' + restaurantId + '/menuItems');
+          console.log('📝 Item details:', foodData.name, '-', foodData.category, '- ₹' + foodData.price);
+          console.log('🔄 Refresh index.html to see the new item!');
+
+        } catch (error) {
+          console.error('Error adding menu item:', error);
+          alert('Failed to add menu item. Please try again.');
+        } finally {
+          // Re-enable submit button
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }
+        }
+      });
+    }
+  }, 100);
+}

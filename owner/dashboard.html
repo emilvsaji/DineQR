@@ -1,80 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#22c55e" />
-  <title>DineQR Owner Dashboard</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- Reuse existing design tokens + base styles -->
-  <link rel="stylesheet" href="../css/styles.css" />
-  <!-- Owner-specific, minimal overrides -->
-  <link rel="stylesheet" href="./owner.css?v=20251229" />
-
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Dashboard - Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="owner.css?v=2">
 </head>
 <body data-page="dashboard">
-  <div class="app">
-    <main class="owner-shell">
-      <header class="owner-header owner-header--row">
-        <div>
-          <h1 class="owner-title" id="restaurantName">Loading…</h1>
-          <p class="owner-subtitle">Owner Dashboard</p>
-        </div>
-        <button class="btn btn--ghost" id="logoutBtn" type="button">Log out</button>
-      </header>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <h1 class="page-title">Menu</h1>
+            </div>
+            
+            <div class="top-bar-center">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" placeholder="Search menu..." class="search-input">
+                </div>
+                
+                <select class="filter-dropdown">
+                    <option>Rating: High to Low</option>
+                    <option>Rating: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Price: Low to High</option>
+                    <option>Name: A to Z</option>
+                </select>
+            </div>
+            
+            <div class="top-bar-right">
+                <button class="add-menu-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Item
+                </button>
+                
+                <button class="logout-btn" id="logoutBtn" title="Logout">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+                
+                <div class="profile-dropdown-wrapper">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=10B981&color=fff" alt="Profile">
+                    </div>
+                    
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dropdown-header">
+                            <div class="profile-info">
+                                <h4 id="profileRestaurantName">Ajwa Kitchen</h4>
+                                <p id="profileTagline">Authentic Arabian • Fresh • Delicious</p>
+                                <p id="profileEmail">Loading...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-dropdown-details">
+                            <div class="profile-detail-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span>Erattupetta, Kerala, India</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                                <span>+91 9876 543210</span>
+                            </div>
+                            <div class="profile-detail-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <span>Daily 11:00 - 23:00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-dropdown-menu">
+                            <a href="#" class="dropdown-item" id="viewMenuLink">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"></path>
+                                </svg>
+                                <span>View Public Menu</span>
+                            </a>
+                            
+                            <a href="#" class="dropdown-item" id="editProfileLink">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                <span>Edit Shop Details</span>
+                            </a>
+                            
+                            <div class="dropdown-divider"></div>
+                            
+                            <a href="#" class="dropdown-item" id="profileLogoutBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                </svg>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-      <section class="card">
-        <h2 class="section-title">Public Menu</h2>
+        <!-- Category Strip -->
+        <section class="category-strip">
+            <div class="category-card active" data-category="all">
+                <div class="category-icon-text">All</div>
+                <div class="category-info">
+                    <h4>All Items</h4>
+                    <p id="allItemsCount">8 items</p>
+                </div>
+            </div>
+            
+            <div class="category-card" data-category="mandi">
+                <div class="category-icon-text">MND</div>
+                <div class="category-info">
+                    <h4>Mandi</h4>
+                    <p>2 items</p>
+                </div>
+            </div>
+            
+            <div class="category-card" data-category="biryani">
+                <div class="category-icon-text">BRY</div>
+                <div class="category-info">
+                    <h4>Biryani</h4>
+                    <p>1 item</p>
+                </div>
+            </div>
+            
+            <div class="category-card" data-category="grills-kebabs">
+                <div class="category-icon-text">GRL</div>
+                <div class="category-info">
+                    <h4>Grills & Kebabs</h4>
+                    <p>2 items</p>
+                </div>
+            </div>
+            
+            <div class="category-card" data-category="shawarma">
+                <div class="category-icon-text">SHW</div>
+                <div class="category-info">
+                    <h4>Shawarma</h4>
+                    <p>1 item</p>
+                </div>
+            </div>
+            
+            <div class="category-card" data-category="appetizers">
+                <div class="category-icon-text">APP</div>
+                <div class="category-info">
+                    <h4>Appetizers</h4>
+                    <p>0 items</p>
+                </div>
+            </div>
+            
+            <div class="category-card" data-category="beverages">
+                <div class="category-icon-text">BEV</div>
+                <div class="category-info">
+                    <h4>Beverages</h4>
+                    <p>1 item</p>
+                </div>
+            </div>
+            
+            <div class="category-card" data-category="desserts">
+                <div class="category-icon-text">DST</div>
+                <div class="category-info">
+                    <h4>Desserts</h4>
+                    <p>1 item</p>
+                </div>
+            </div>
+        </section>
 
-        <div class="row">
-          <input class="field__input" id="publicUrl" type="text" readonly />
-          <button class="btn btn--secondary" id="copyUrlBtn" type="button">Copy</button>
-        </div>
+        <!-- Food Cards Grid -->
+        <section class="food-grid">
+            <!-- Food Card 1 - Chicken Mandi -->
+            <div class="food-card" data-category="mandi">
+                <div class="food-image">
+                    <span class="best-seller-tag">Bestseller</span>
+                    <span class="food-type-badge non-veg">Non-Veg</span>
+                    <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop" alt="Chicken Mandi">
+                </div>
+                <div class="food-info">
+                    <h3 class="food-name">Chicken Mandi</h3>
+                    <p class="food-description">Tender smoked chicken with aromatic rice</p>
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.8</span>
+                    </div>
+                    <div class="food-price">₹ 199 - ₹ 599</div>
+                </div>
+            </div>
 
-        <div class="row">
-          <button class="btn btn--primary" id="qrBtn" type="button">QR code</button>
-          <span class="helper" id="topStatus" role="status" aria-live="polite"></span>
-        </div>
+            <!-- Food Card 2 - Mutton Mandi -->
+            <div class="food-card" data-category="mandi">
+                <div class="food-image">
+                    <span class="food-type-badge non-veg">Non-Veg</span>
+                    <img src="https://images.unsplash.com/photo-1642821373181-696a54913e93?w=400&h=300&fit=crop" alt="Mutton Mandi">
+                </div>
+                <div class="food-info">
+                    <h3 class="food-name">Mutton Mandi</h3>
+                    <p class="food-description">Succulent lamb with fragrant saffron rice</p>
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.9</span>
+                    </div>
+                    <div class="food-price">₹ 299 - ₹ 999</div>
+                </div>
+            </div>
 
-        <div class="qr" id="qrWrap" hidden>
-          <canvas id="qrCanvas" width="220" height="220"></canvas>
-          <p class="helper">Scan to open the menu.</p>
-        </div>
-      </section>
+            <!-- Food Card 3 - Hyderabadi Chicken Biryani -->
+            <div class="food-card" data-category="biryani">
+                <div class="food-image">
+                    <span class="best-seller-tag">Bestseller</span>
+                    <span class="food-type-badge non-veg">Non-Veg</span>
+                    <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop" alt="Hyderabadi Chicken Biryani">
+                </div>
+                <div class="food-info">
+                    <h3 class="food-name">Hyderabadi Chicken Biryani</h3>
+                    <p class="food-description">Layered dum biryani with authentic spices</p>
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.9</span>
+                    </div>
+                    <div class="food-price">₹ 249 - ₹ 549</div>
+                </div>
+            </div>
 
-      <section class="card" id="setupWrap" hidden>
-        <h2 class="section-title">Setup</h2>
-        <p class="helper">Link this owner account to your restaurant id (example: <strong>ajwa</strong>).</p>
-        <div class="form" style="margin-top: 10px;">
-          <input class="field__input" id="setupRestaurantName" type="text" placeholder="Restaurant name (shown on top)" />
-          <input class="field__input" id="setupRestaurantId" type="text" placeholder="Restaurant id" />
-          <button class="btn btn--primary" id="setupSaveBtn" type="button">Link restaurant</button>
-          <p class="helper" id="setupStatus" role="status" aria-live="polite"></p>
-        </div>
-      </section>
+            <!-- Food Card 4 - Al Faham -->
+            <div class="food-card" data-category="grills-kebabs">
+                <div class="food-image">
+                    <span class="food-type-badge non-veg">Non-Veg</span>
+                    <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=400&h=300&fit=crop" alt="Al Faham">
+                </div>
+                <div class="food-info">
+                    <h3 class="food-name">Al Faham</h3>
+                    <p class="food-description">Grilled chicken with Lebanese spices</p>
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.8</span>
+                    </div>
+                    <div class="food-price">₹ 179 - ₹ 599</div>
+                </div>
+            </div>
 
-      <section class="card" id="menuWrap">
-        <h2 class="section-title">Menu</h2>
-        <div class="row" style="margin-bottom: 10px;">
-          <button class="btn btn--secondary" id="addCategoryBtn" type="button">Add category</button>
-        </div>
-        <div class="status" id="menuStatus">Loading menu…</div>
-        <div id="categories"></div>
-      </section>
+            <!-- Food Card 5 - Chicken Shawarma -->
+            <div class="food-card" data-category="shawarma">
+                <div class="food-image">
+                    <span class="best-seller-tag">Bestseller</span>
+                    <span class="food-type-badge non-veg">Non-Veg</span>
+                    <img src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&h=300&fit=crop" alt="Chicken Shawarma">
+                </div>
+                <div class="food-info">
+                    <h3 class="food-name">Chicken Shawarma</h3>
+                    <p class="food-description">Wrapped in pita with garlic sauce</p>
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.7</span>
+                    </div>
+                    <div class="food-price">₹ 99 - ₹ 199</div>
+                </div>
+            </div>
 
-      <p class="footer-note">Changes auto-save instantly.</p>
+            <!-- Food Card 6 - Kunafa -->
+            <div class="food-card" data-category="desserts">
+                <div class="food-image">
+                    <span class="best-seller-tag">Must Try</span>
+                    <span class="food-type-badge veg">Veg</span>
+                    <img src="https://images.unsplash.com/photo-1579888944880-d98341245702?w=400&h=300&fit=crop" alt="Kunafa">
+                </div>
+                <div class="food-info">
+                    <h3 class="food-name">Kunafa</h3>
+                    <p class="food-description">Sweet cheese with rose syrup</p>
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.9</span>
+                    </div>
+                    <div class="food-price">₹ 149</div>
+                </div>
+            </div>
+
+            <!-- Food Card 7 - Paneer Tikka -->
+            <div class="food-card" data-category="grills-kebabs">
+                <div class="food-image">
+                    <span class="food-type-badge veg">Veg</span>
+                    <img src="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&h=300&fit=crop" alt="Paneer Tikka">
+                </div>
+                <div class="food-info">
+                    <h3 class="food-name">Paneer Tikka</h3>
+                    <p class="food-description">Grilled cottage cheese with spices</p>
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.6</span>
+                    </div>
+                    <div class="food-price">₹ 229 - ₹ 399</div>
+                </div>
+            </div>
+
+            <!-- Food Card 8 - Mango Lassi -->
+            <div class="food-card" data-category="beverages">
+                <div class="food-image">
+                    <span class="food-type-badge veg">Veg</span>
+                    <img src="https://images.unsplash.com/photo-1553530666-ba11a90bb3ae?w=400&h=300&fit=crop" alt="Mango Lassi">
+                </div>
+                <div class="food-info">
+                    <h3 class="food-name">Mango Lassi</h3>
+                    <p class="food-description">Creamy yogurt with fresh mango</p>
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.5</span>
+                    </div>
+                    <div class="food-price">₹ 79</div>
+                </div>
+            </div>
+        </section>
     </main>
-  </div>
 
-  <!-- QR library (tiny, no UI framework) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Add Menu Item Modal -->
+    <div class="modal-overlay" id="addMenuOverlay"></div>
+    <div class="add-menu-modal" id="addMenuModal">
+        <div class="modal-header">
+            <h2>Add Item</h2>
+            <button class="modal-close-btn" id="closeAddMenuBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <form class="add-menu-form" id="addMenuForm">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label class="form-label">Food Name *</label>
+                    <input type="text" class="form-input" id="foodName" placeholder="e.g., Margherita Pizza" required>
+                </div>
 
-  <!-- Firebase Auth + Firestore wiring lives in owner.js -->
-  <script type="module" src="./owner.js?v=20251229"></script>
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select class="form-input" id="foodCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="mandi">Mandi</option>
+                        <option value="biryani">Biryani</option>
+                        <option value="grills-kebabs">Grills & Kebabs</option>
+                        <option value="shawarma">Shawarma</option>
+                        <option value="appetizers">Appetizers</option>
+                        <option value="beverages">Beverages</option>
+                        <option value="desserts">Desserts</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Price (₹) *</label>
+                    <input type="number" class="form-input" id="foodPrice" placeholder="299" min="0" step="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Preparation Time *</label>
+                    <input type="text" class="form-input" id="foodPrepTime" placeholder="20-25 min" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Rating (0-5)</label>
+                    <input type="number" class="form-input" id="foodRating" placeholder="4.8" min="0" max="5" step="0.1" value="4.5">
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" id="foodDescription" rows="3" placeholder="Describe your delicious food item..."></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label">Image URL</label>
+                    <input type="url" class="form-input" id="foodImage" placeholder="https://images.unsplash.com/photo-...">
+                    <small class="form-hint">Use Unsplash or other food image URLs</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select class="form-input" id="foodType">
+                        <option value="">Regular</option>
+                        <option value="bestseller">Best Seller</option>
+                        <option value="new">New Item</option>
+                        <option value="special">Special</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Delivery Count</label>
+                    <input type="number" class="form-input" id="foodDeliveryCount" placeholder="150" min="0" value="0">
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="foodAvailable" checked>
+                        <span>Available for order</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelAddMenuBtn">Cancel</button>
+                <button type="submit" class="btn-primary" id="submitAddMenuBtn">Add Item</button>
+            </div>
+        </form>
+    </div>
+
+    <script type="module" src="owner.js?v=20251229"></script>
 </body>
 </html>
