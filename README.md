@@ -2,6 +2,65 @@
 
 A lightweight, mobile-first QR menu web app.
 
+## Firebase (Migration)
+
+This repo now includes an **Owner Page** that uses:
+
+- Firebase Authentication (email/password)
+- Firestore (real-time)
+
+### 1) Add Firebase config
+
+Fill in your Firebase Web App config here:
+
+- `js/firebase-config.js`
+
+Then the shared initializer exports `auth` and `db` from:
+
+- `js/firebase.js`
+
+### 2) Owner pages
+
+- `owner/login.html`
+- `owner/dashboard.html`
+- `owner/owner.js`
+- `owner/owner.css`
+
+Owner-to-restaurant mapping used by the dashboard:
+
+- `owners/{uid}` → `{ restaurantId: "ajwa" }`
+
+Create an owner login + link it to a restaurant (recommended):
+
+- `tools/create-owner-user.mjs`
+
+Example (PowerShell):
+
+- `$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\path\to\serviceAccount.json"`
+- `node tools/create-owner-user.mjs --email owner@ajwa.com --password "DineQR123!" --restaurantId ajwa`
+
+Menu structure in Firestore:
+
+- `restaurants/{restaurantId}`
+  - `categories/{categoryId}`
+    - `items/{itemId}`
+
+> Firestore Security Rules should ensure owners can only read/write their own restaurant.
+
+### 3) Migrate existing JSON menus to Firestore
+
+There is a Node script to import `restaurants/<id>/menu.json` into Firestore:
+
+- `tools/migrate-json-to-firestore.mjs`
+
+High-level steps:
+
+- Install Node 18+
+- `npm init -y`
+- `npm i firebase-admin`
+- Set `$env:GOOGLE_APPLICATION_CREDENTIALS` to your service account JSON path
+- Run: `node tools/migrate-json-to-firestore.mjs`
+
 ## Folder layout
 
 - `index.html` – app shell

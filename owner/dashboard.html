@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#22c55e" />
+  <title>DineQR Owner Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Reuse existing design tokens + base styles -->
+  <link rel="stylesheet" href="../css/styles.css" />
+  <!-- Owner-specific, minimal overrides -->
+  <link rel="stylesheet" href="./owner.css?v=20251229" />
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>" />
+</head>
+<body data-page="dashboard">
+  <div class="app">
+    <main class="owner-shell">
+      <header class="owner-header owner-header--row">
+        <div>
+          <h1 class="owner-title" id="restaurantName">Loading…</h1>
+          <p class="owner-subtitle">Owner Dashboard</p>
+        </div>
+        <button class="btn btn--ghost" id="logoutBtn" type="button">Log out</button>
+      </header>
+
+      <section class="card">
+        <h2 class="section-title">Public Menu</h2>
+
+        <div class="row">
+          <input class="field__input" id="publicUrl" type="text" readonly />
+          <button class="btn btn--secondary" id="copyUrlBtn" type="button">Copy</button>
+        </div>
+
+        <div class="row">
+          <button class="btn btn--primary" id="qrBtn" type="button">QR code</button>
+          <span class="helper" id="topStatus" role="status" aria-live="polite"></span>
+        </div>
+
+        <div class="qr" id="qrWrap" hidden>
+          <canvas id="qrCanvas" width="220" height="220"></canvas>
+          <p class="helper">Scan to open the menu.</p>
+        </div>
+      </section>
+
+      <section class="card" id="setupWrap" hidden>
+        <h2 class="section-title">Setup</h2>
+        <p class="helper">Link this owner account to your restaurant id (example: <strong>ajwa</strong>).</p>
+        <div class="form" style="margin-top: 10px;">
+          <input class="field__input" id="setupRestaurantName" type="text" placeholder="Restaurant name (shown on top)" />
+          <input class="field__input" id="setupRestaurantId" type="text" placeholder="Restaurant id" />
+          <button class="btn btn--primary" id="setupSaveBtn" type="button">Link restaurant</button>
+          <p class="helper" id="setupStatus" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="card" id="menuWrap">
+        <h2 class="section-title">Menu</h2>
+        <div class="row" style="margin-bottom: 10px;">
+          <button class="btn btn--secondary" id="addCategoryBtn" type="button">Add category</button>
+        </div>
+        <div class="status" id="menuStatus">Loading menu…</div>
+        <div id="categories"></div>
+      </section>
+
+      <p class="footer-note">Changes auto-save instantly.</p>
+    </main>
+  </div>
+
+  <!-- QR library (tiny, no UI framework) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+  <!-- Firebase Auth + Firestore wiring lives in owner.js -->
+  <script type="module" src="./owner.js?v=20251229"></script>
+</body>
+</html>

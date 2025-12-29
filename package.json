@@ -1,0 +1,23 @@
+{
+  "name": "dineqr",
+  "version": "1.0.0",
+  "description": "A lightweight, mobile-first QR menu web app.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emilvsaji/DineQR.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emilvsaji/DineQR/issues"
+  },
+  "homepage": "https://github.com/emilvsaji/DineQR#readme",
+  "dependencies": {
+    "firebase-admin": "^13.6.0"
+  }
+}
