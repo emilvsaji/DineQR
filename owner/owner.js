@@ -30,6 +30,7 @@ import {
   getFirestore,
   doc,
   getDoc,
+  getDocs,
   setDoc,
   collection,
   onSnapshot,
@@ -297,45 +298,147 @@ function initDashboardPage() {
     });
   }
   
-  // Category filtering
-  const categoryCards = document.querySelectorAll('.category-card');
-  const foodCards = document.querySelectorAll('.food-card');
-  
-  if (categoryCards.length > 0 && foodCards.length > 0) {
-    categoryCards.forEach(card => {
-      card.addEventListener('click', () => {
-        const category = card.dataset.category;
+  // Function to load and render menu items from Firestore
+  async function loadDashboardMenuItems(restaurantId) {
+    const foodGrid = document.querySelector('.food-grid');
+    if (!foodGrid) return;
+
+    console.log('🔄 Loading menu items from Firestore for dashboard...');
+    
+    try {
+      const menuItemsRef = collection(db, 'restaurants', restaurantId, 'menuItems');
+      const menuItemsSnapshot = await getDocs(menuItemsRef);
+
+      console.log('📊 Found', menuItemsSnapshot.size, 'items in Firestore');
+
+      // Clear existing food cards
+      foodGrid.innerHTML = '';
+
+      if (menuItemsSnapshot.empty) {
+        foodGrid.innerHTML = '<div class="empty-state"><p>No menu items yet. Click "Add Item" to create your first item!</p></div>';
+        return;
+      }
+
+      // Render each menu item
+      menuItemsSnapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        const itemId = docSnap.id;
         
-        // Update active state
-        categoryCards.forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        
-        // Filter food cards
-        if (category === 'all') {
-          // Show all food cards
-          foodCards.forEach(foodCard => {
-            foodCard.style.display = 'block';
-          });
-        } else {
-          // Show only matching category
-          foodCards.forEach(foodCard => {
-            if (foodCard.dataset.category === category) {
-              foodCard.style.display = 'block';
-            } else {
-              foodCard.style.display = 'none';
-            }
-          });
+        // Create food card element
+        const foodCard = document.createElement('div');
+        foodCard.className = 'food-card';
+        foodCard.dataset.category = item.category || 'other';
+        foodCard.dataset.itemId = itemId;
+
+        // Determine type badge
+        let typeBadge = '';
+        if (item.type === 'bestseller') {
+          typeBadge = '<span class="best-seller-tag">Bestseller</span>';
+        } else if (item.type === 'new') {
+          typeBadge = '<span class="best-seller-tag" style="background: #3b82f6;">New</span>';
+        } else if (item.type === 'special') {
+          typeBadge = '<span class="best-seller-tag" style="background: #f59e0b;">Special</span>';
         }
+
+        // Determine veg/non-veg badge (you can add this field in the Add Item form)
+        const vegBadge = item.isVeg ? 
+          '<span class="food-type-badge veg">Veg</span>' : 
+          '<span class="food-type-badge non-veg">Non-Veg</span>';
+
+        // Default image if none provided
+        const imageUrl = item.image || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23f3f4f6" width="100" height="100"/%3E%3Ctext x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="30"%3E🍽️%3C/text%3E%3C/svg%3E';
+
+        // Generate star rating
+        const rating = item.rating || 4.5;
+        const fullStars = Math.floor(rating);
+        const stars = '⭐'.repeat(fullStars);
+
+        foodCard.innerHTML = `
+          <div class="food-image">
+            ${typeBadge}
+            ${vegBadge}
+            <img src="${imageUrl}" alt="${item.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect fill=\'%23f3f4f6\' width=\'100\' height=\'100\'/%3E%3Ctext x=\'50\' y=\'55\' text-anchor=\'middle\' fill=\'%239ca3af\' font-size=\'30\'%3E🍽️%3C/text%3E%3C/svg%3E'">
+          </div>
+          <div class="food-info">
+            <h3 class="food-name">${item.name}</h3>
+            <p class="food-description">${item.description || ''}</p>
+            <div class="rating">
+              <span class="stars">${stars}</span>
+              <span class="rating-text">${rating.toFixed(1)}</span>
+            </div>
+            <div class="food-price">₹ ${item.price}</div>
+            ${!item.available ? '<div class="unavailable-badge">Unavailable</div>' : ''}
+          </div>
+        `;
+
+        foodGrid.appendChild(foodCard);
       });
-    });
+
+      console.log('✅ Dashboard menu items loaded successfully');
+      
+      // Re-initialize category filtering with new cards
+      initCategoryFiltering();
+      
+    } catch (error) {
+      console.error('❌ Error loading dashboard menu items:', error);
+      foodGrid.innerHTML = '<div class="error-state"><p>Error loading menu items. Please refresh the page.</p></div>';
+    }
+  }
+
+  // Category filtering function (can be called after loading items)
+  function initCategoryFiltering() {
+    const categoryCards = document.querySelectorAll('.category-card');
+    const foodCards = document.querySelectorAll('.food-card');
+    
+    if (categoryCards.length > 0 && foodCards.length > 0) {
+      // Remove previous listeners by cloning
+      categoryCards.forEach(card => {
+        const newCard = card.cloneNode(true);
+        card.parentNode.replaceChild(newCard, card);
+      });
+      
+      // Add new listeners
+      document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const category = card.dataset.category;
+          
+          // Update active state
+          document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          
+          // Filter food cards
+          const currentFoodCards = document.querySelectorAll('.food-card');
+          if (category === 'all') {
+            // Show all food cards
+            currentFoodCards.forEach(foodCard => {
+              foodCard.style.display = 'block';
+            });
+          } else {
+            // Show only matching category
+            currentFoodCards.forEach(foodCard => {
+              if (foodCard.dataset.category === category) {
+                foodCard.style.display = 'block';
+              } else {
+                foodCard.style.display = 'none';
+              }
+            });
+          }
+        });
+      });
+    }
   }
   
-  // Search functionality
+  // Initial category filtering for static cards (fallback)
+  initCategoryFiltering();
+  
+  // Search functionality (works with dynamic cards)
   const searchInput = document.querySelector('.search-input');
   
-  if (searchInput && foodCards.length > 0) {
+  if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       const searchTerm = e.target.value.toLowerCase().trim();
+      const currentFoodCards = document.querySelectorAll('.food-card');
+      const categoryCards = document.querySelectorAll('.category-card');
       
       // Reset category to "All" when searching
       if (searchTerm) {
@@ -345,7 +448,7 @@ function initDashboardPage() {
       }
       
       // Filter food cards by search term
-      foodCards.forEach(foodCard => {
+      currentFoodCards.forEach(foodCard => {
         const foodName = foodCard.querySelector('.food-name')?.textContent.toLowerCase() || '';
         const foodDescription = foodCard.querySelector('.food-description')?.textContent.toLowerCase() || '';
         
@@ -401,6 +504,25 @@ function initDashboardPage() {
     if (profileEmailEl) {
       profileEmailEl.textContent = user.email;
     }
+    
+    // Load restaurant ID and menu items
+    (async () => {
+      try {
+        const ownerDoc = await getDoc(doc(db, 'owners', user.uid));
+        const ownerData = ownerDoc.data();
+        const userRestaurantId = ownerData?.restaurantId || 'ajwa';
+        
+        console.log('🏪 Loading menu for restaurant:', userRestaurantId);
+        
+        // Store restaurantId globally for Add Item form
+        window.currentRestaurantId = userRestaurantId;
+        
+        // Load menu items from Firestore
+        await loadDashboardMenuItems(userRestaurantId);
+      } catch (error) {
+        console.error('❌ Error loading restaurant data:', error);
+      }
+    })();
     
     loadDashboard();
   });
@@ -1172,6 +1294,7 @@ if (page === "dashboard") {
             description: $('#foodDescription')?.value.trim() || '',
             image: $('#foodImage')?.value.trim() || '',
             type: $('#foodType')?.value.trim(),
+            isVeg: $('#foodVegType')?.value === 'true',
             deliveryCount: parseInt($('#foodDeliveryCount')?.value) || 0,
             available: $('#foodAvailable')?.checked !== false,
             createdAt: serverTimestamp(),
@@ -1197,12 +1320,13 @@ if (page === "dashboard") {
           // Add to Firestore - Save to menuItems collection
           // This matches the structure that index.html expects
           const menuItemsRef = collection(db, 'restaurants', restaurantId, 'menuItems');
-          await addDoc(menuItemsRef, {
+          const docRef = await addDoc(menuItemsRef, {
             name: foodData.name,
             category: foodData.category,
             description: foodData.description,
             price: foodData.price,
             type: foodData.type || 'regular',
+            isVeg: foodData.isVeg,
             available: foodData.available,
             rating: foodData.rating,
             prepTime: foodData.prepTime,
@@ -1212,16 +1336,21 @@ if (page === "dashboard") {
             updatedAt: serverTimestamp()
           });
 
+          // Log success with details
+          console.log('✅ Menu item added to Firestore!');
+          console.log('📍 Path: restaurants/' + restaurantId + '/menuItems/' + docRef.id);
+          console.log('📝 Item details:', foodData.name, '-', foodData.category, '- ₹' + foodData.price);
+          console.log('🔗 View in Firestore Console: https://console.firebase.google.com/project/dineqr-6b64c/firestore/databases/-default-/data/~2Frestaurants~2F' + restaurantId + '~2FmenuItems~2F' + docRef.id);
+          
           // Show success message
-          alert('✅ Item added successfully!\\n\\n📱 View it on your menu:\\nhttp://localhost:8000/index.html\\n\\n💡 Tip: Open the browser console (F12) to see Firestore logs!');
+          alert('✅ Item added successfully!\n\n📍 Saved to:\nrestaurants/' + restaurantId + '/menuItems/' + docRef.id);
           
           // Close modal and reset form
           closeAddMenuModal();
-
-          // Log success with details
-          console.log('✅ Menu item added to Firestore at restaurants/' + restaurantId + '/menuItems');
-          console.log('📝 Item details:', foodData.name, '-', foodData.category, '- ₹' + foodData.price);
-          console.log('🔄 Refresh index.html to see the new item!');
+          
+          // Reload dashboard menu items to show new item
+          console.log('🔄 Reloading dashboard...');
+          await loadDashboardMenuItems(restaurantId);
 
         } catch (error) {
           console.error('Error adding menu item:', error);

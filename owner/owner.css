@@ -402,6 +402,44 @@ body {
     gap: 24px;
 }
 
+.empty-state,
+.error-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #e2e8f0;
+}
+
+.empty-state p,
+.error-state p {
+    font-size: 16px;
+    color: #64748b;
+    margin: 0;
+}
+
+.error-state {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.error-state p {
+    color: #dc2626;
+}
+
+.unavailable-badge {
+    background: #fca5a5;
+    color: #dc2626;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 8px;
+    display: inline-block;
+}
+
 .food-card {
     background: white;
     border-radius: 16px;

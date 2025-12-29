@@ -207,17 +207,7 @@ import { db } from "./firebase.js";
     try {
       console.log('🔍 Loading from Firestore: restaurants/' + restaurantId + '/menuItems');
       
-      // Get restaurant info
-      const restaurantDoc = await getDoc(doc(db, 'restaurants', restaurantId));
-      if (!restaurantDoc.exists()) {
-        console.log('⚠️ Restaurant document not found in Firestore');
-        return null;
-      }
-
-      const restaurantData = restaurantDoc.data();
-      console.log('✅ Restaurant found:', restaurantData.name || restaurantId);
-
-      // Get menu items
+      // Get menu items directly (don't require restaurant document)
       const menuItemsRef = collection(db, 'restaurants', restaurantId, 'menuItems');
       const menuItemsSnapshot = await getDocs(menuItemsRef);
 
@@ -226,6 +216,20 @@ import { db } from "./firebase.js";
       if (menuItemsSnapshot.empty) {
         console.log('⚠️ No menu items found in Firestore, will try JSON fallback');
         return null;
+      }
+
+      // Try to get restaurant info (optional)
+      let restaurantData = {};
+      try {
+        const restaurantDoc = await getDoc(doc(db, 'restaurants', restaurantId));
+        if (restaurantDoc.exists()) {
+          restaurantData = restaurantDoc.data();
+          console.log('✅ Restaurant info found:', restaurantData.name || restaurantId);
+        } else {
+          console.log('ℹ️ No restaurant document, using defaults');
+        }
+      } catch (err) {
+        console.log('ℹ️ Could not load restaurant document, using defaults');
       }
 
       // Group items by category
@@ -291,25 +295,6 @@ import { db } from "./firebase.js";
       };
     } catch (error) {
       console.error('❌ Error loading from Firestore:', error);
-      return null;
-    }
-  }
-
-      return {
-        currency: 'INR',
-        restaurant: {
-          id: restaurantId,
-          name: restaurantData.name || 'Restaurant',
-          tagline: restaurantData.tagline || 'Delicious • Fresh • Quality',
-          address: restaurantData.address || '',
-          hours: restaurantData.hours || '',
-          logo: restaurantData.logo || '',
-        },
-        categories: categories
-      };
-
-    } catch (error) {
-      console.error('Error loading from Firestore:', error);
       return null;
     }
   }
