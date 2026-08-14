@@ -1,0 +1,80 @@
+/*
+  SETUP SCRIPT: Initialize Firestore with owner and restaurant data
+  Run this in browser console at: http://localhost:8000/setup.html
+*/
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  collection,
+  addDoc,
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { firebaseConfig } from "./js/firebase-config.js";
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function setupInitialData() {
+  console.log("🚀 Setting up initial Firestore data...");
+
+  try {
+    // 1. Create restaurant document
+    console.log("📍 Creating restaurant document...");
+    const restaurantRef = doc(db, "restaurants", "ajwa");
+    await setDoc(restaurantRef, {
+      id: "ajwa",
+      name: "Ajwa Kitchen",
+      tagline: "Authentic Arabian • Fresh • Quality",
+      address: "Erattupetta, Kerala, India",
+      phone: "+91 9876 543210",
+      openHours: "Daily 11:00 - 23:00",
+      currency: "INR",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    console.log("✅ Restaurant 'ajwa' created");
+
+    // 2. Create owner document (you'll need to replace with real owner UID)
+    // For now, we'll use a placeholder - you'll need to get the actual UID after login
+    console.log("⚠️  Owner setup requires authentication first!");
+    console.log("📝 Steps to complete setup:");
+    console.log("   1. Go to http://localhost:8000/owner/login.html");
+    console.log("   2. Create/login to get your user UID");
+    console.log("   3. Run the owner setup script with your UID");
+
+    alert("✅ Restaurant data added!\n\n⚠️  Next: Set up owner account\n\n1. Login at: http://localhost:8000/owner/login.html\n2. Get your User UID from browser console\n3. Run owner setup script");
+
+  } catch (error) {
+    console.error("❌ Setup failed:", error);
+    alert("❌ Setup failed: " + error.message);
+  }
+}
+
+// Function to setup owner (run after getting UID)
+window.setupOwner = async function(ownerUid) {
+  try {
+    console.log("👤 Setting up owner with UID:", ownerUid);
+
+    const ownerRef = doc(db, "owners", ownerUid);
+    await setDoc(ownerRef, {
+      uid: ownerUid,
+      restaurantId: "ajwa",
+      role: "owner",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    console.log("✅ Owner setup complete!");
+    alert("✅ Owner account linked to Ajwa Kitchen!");
+
+  } catch (error) {
+    console.error("❌ Owner setup failed:", error);
+    alert("❌ Owner setup failed: " + error.message);
+  }
+};
+
+// Auto-run setup
+setupInitialData();
