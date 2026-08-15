@@ -1,80 +1,230 @@
-/*
-  SETUP SCRIPT: Initialize Firestore with owner and restaurant data
-  Run this in browser console at: http://localhost:8000/setup.html
-*/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DineQR - Database & Owner Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .setup-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 600px;
+      padding: 32px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .logo {
+      font-size: 40px;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .card-section {
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card-section h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      text-decoration: none;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #334155;
+      margin-top: 10px;
+    }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .input-group {
+      margin-bottom: 12px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .input-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+    .input-group input:focus {
+      border-color: var(--primary);
+    }
+    .console-log {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 14px;
+      border-radius: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-top: 16px;
+    }
+    .quick-links {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="setup-container">
+    <div class="header">
+      <div class="logo">🍽️</div>
+      <h1>DineQR Setup Assistant</h1>
+      <p class="subtitle">Initialize Firestore documents and configure your restaurant</p>
+    </div>
 
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  collection,
-  addDoc,
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { firebaseConfig } from "./js/firebase-config.js";
+    <div class="card-section">
+      <h2>Step 1: Initialize Restaurant Data</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Creates the default 'ajwa' restaurant record in Firestore.</p>
+      <button class="btn" id="initRestaurantBtn">Initialize Restaurant Data</button>
+    </div>
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    <div class="card-section">
+      <h2>Step 2: Link Owner Account</h2>
+      <div class="input-group">
+        <label for="ownerUidInput">Owner Firebase UID</label>
+        <input type="text" id="ownerUidInput" placeholder="Paste UID from Firebase Console or Login page">
+      </div>
+      <div class="input-group">
+        <label for="restaurantIdInput">Restaurant ID</label>
+        <input type="text" id="restaurantIdInput" value="ajwa" placeholder="e.g. ajwa">
+      </div>
+      <button class="btn" id="linkOwnerBtn">Link Owner to Restaurant</button>
+    </div>
 
-async function setupInitialData() {
-  console.log("🚀 Setting up initial Firestore data...");
+    <div class="card-section" style="margin-bottom:0;">
+      <h2>Output Logs</h2>
+      <div class="console-log" id="logOutput">Ready. Click a button to perform setup...</div>
+    </div>
 
-  try {
-    // 1. Create restaurant document
-    console.log("📍 Creating restaurant document...");
-    const restaurantRef = doc(db, "restaurants", "ajwa");
-    await setDoc(restaurantRef, {
-      id: "ajwa",
-      name: "Ajwa Kitchen",
-      tagline: "Authentic Arabian • Fresh • Quality",
-      address: "Erattupetta, Kerala, India",
-      phone: "+91 9876 543210",
-      openHours: "Daily 11:00 - 23:00",
-      currency: "INR",
-      createdAt: new Date(),
-      updatedAt: new Date()
+    <div class="quick-links">
+      <a href="index.html?r=ajwa" class="btn btn-secondary">Open Customer Menu</a>
+      <a href="owner/login.html" class="btn btn-secondary">Open Owner Login</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { firebaseConfig } from "./js/firebase-config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const logEl = document.getElementById("logOutput");
+    function log(msg) {
+      logEl.textContent += "\n" + msg;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    document.getElementById("initRestaurantBtn").addEventListener("click", async () => {
+      try {
+        log("📍 Creating/Updating restaurant 'ajwa'...");
+        await setDoc(doc(db, "restaurants", "ajwa"), {
+          id: "ajwa",
+          name: "Ajwa Kitchen",
+          tagline: "Authentic Arabian • Fresh • Quality",
+          address: "Erattupetta, Kerala, India",
+          phone: "+91 9876 543210",
+          openHours: "Daily 11:00 - 23:00",
+          currency: "INR",
+          updatedAt: new Date()
+        }, { merge: true });
+        log("✅ Restaurant 'ajwa' saved successfully!");
+      } catch (err) {
+        log("❌ Failed to initialize restaurant: " + err.message);
+      }
     });
-    console.log("✅ Restaurant 'ajwa' created");
 
-    // 2. Create owner document (you'll need to replace with real owner UID)
-    // For now, we'll use a placeholder - you'll need to get the actual UID after login
-    console.log("⚠️  Owner setup requires authentication first!");
-    console.log("📝 Steps to complete setup:");
-    console.log("   1. Go to http://localhost:8000/owner/login.html");
-    console.log("   2. Create/login to get your user UID");
-    console.log("   3. Run the owner setup script with your UID");
-
-    alert("✅ Restaurant data added!\n\n⚠️  Next: Set up owner account\n\n1. Login at: http://localhost:8000/owner/login.html\n2. Get your User UID from browser console\n3. Run owner setup script");
-
-  } catch (error) {
-    console.error("❌ Setup failed:", error);
-    alert("❌ Setup failed: " + error.message);
-  }
-}
-
-// Function to setup owner (run after getting UID)
-window.setupOwner = async function(ownerUid) {
-  try {
-    console.log("👤 Setting up owner with UID:", ownerUid);
-
-    const ownerRef = doc(db, "owners", ownerUid);
-    await setDoc(ownerRef, {
-      uid: ownerUid,
-      restaurantId: "ajwa",
-      role: "owner",
-      createdAt: new Date(),
-      updatedAt: new Date()
+    document.getElementById("linkOwnerBtn").addEventListener("click", async () => {
+      const uid = document.getElementById("ownerUidInput").value.trim();
+      const restaurantId = document.getElementById("restaurantIdInput").value.trim() || "ajwa";
+      if (!uid) {
+        alert("Please enter the Owner UID");
+        return;
+      }
+      try {
+        log("👤 Linking owner " + uid + " to " + restaurantId + "...");
+        await setDoc(doc(db, "owners", uid), {
+          uid: uid,
+          restaurantId: restaurantId,
+          role: "owner",
+          updatedAt: new Date()
+        }, { merge: true });
+        log("✅ Owner successfully linked to " + restaurantId + "!");
+      } catch (err) {
+        log("❌ Failed to link owner: " + err.message);
+      }
     });
-
-    console.log("✅ Owner setup complete!");
-    alert("✅ Owner account linked to Ajwa Kitchen!");
-
-  } catch (error) {
-    console.error("❌ Owner setup failed:", error);
-    alert("❌ Owner setup failed: " + error.message);
-  }
-};
-
-// Auto-run setup
-setupInitialData();
+  </script>
+</body>
+</html>
